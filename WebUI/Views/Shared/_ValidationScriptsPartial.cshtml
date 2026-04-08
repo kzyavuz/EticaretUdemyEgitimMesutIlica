@@ -1,2 +1,29 @@
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // Bootstrap 5 + jQuery Unobtrusive Validation entegrasyonu
+    $.validator.setDefaults({
+        highlight: function (element) {
+            $(element).addClass('is-invalid').removeClass('is-valid');
+        },
+        unhighlight: function (element) {
+            $(element).addClass('is-valid').removeClass('is-invalid');
+        }
+    });
+
+    // Sunucu tarafı doğrulama hatalarını Bootstrap sınıflarına eşle
+    document.addEventListener('DOMContentLoaded', function () {
+        // input-validation-error → is-invalid
+        document.querySelectorAll('.input-validation-error').forEach(function (el) {
+            el.classList.add('is-invalid');
+        });
+        // Hata olan form varsa başarılı & dolu alanları is-valid yap
+        if (document.querySelectorAll('.input-validation-error').length > 0) {
+            document.querySelectorAll('input[data-val], select[data-val], textarea[data-val]').forEach(function (el) {
+                if (!el.classList.contains('is-invalid') && el.value.trim() !== '') {
+                    el.classList.add('is-valid');
+                }
+            });
+        }
+    });
+</script>

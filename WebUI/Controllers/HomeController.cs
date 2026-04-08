@@ -1,10 +1,10 @@
-using EticaretUdemyEgitim.WebUI.Models;
+using WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace EticaretUdemyEgitim.WebUI.Controllers
+namespace WebUI.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public IActionResult Index()
         {

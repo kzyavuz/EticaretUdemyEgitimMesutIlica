@@ -1,17 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
 {
-    public class Category: IBaseEntity
+    public class Category : IBaseEntity
     {
-        public int ParentId { get; set; }
+        [Display(Name = "Kategori Adı")]
+        [Required(ErrorMessage = "Kategori adı zorunludur.")]
+        [StringLength(150, ErrorMessage = "Kategori adı en fazla 150 karakter olabilir.")]
         public string Title { get; set; }
-        public string? Description { get; set; }
-        public string? Image { get; set; }
-        public bool ISTopMenu { get; set; }
 
+        [Display(Name = "Üst Kategori")]
+        public int ParentId { get; set; }
+
+        [Display(Name = "Açıklama")]
+        public string? Description { get; set; }
+
+        [Display(Name = "Kategori Görseli")]
+        public string? Image { get; set; }
+
+        [Display(Name = "Üst Menüde Göster")]
+        public bool ISTopMenu { get; set; }
+    
         public ICollection<Product>? Products { get; set; }
     }
 }

@@ -1,0 +1,114 @@
+﻿@model IEnumerable<AppUser>
+
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-users me-2"></i>Kullanıcı Yönetimi</h1>
+    <a asp-action="Form" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+       title="Yeni admin eklemek için tıklayın"><i class="fas fa-circle-plus me-2"></i>Yeni Kullanıcı Ekle</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Kullanıcı Listesi
+    </div>
+    <div class="card-body" style="overflow: visible;">
+        <table id="datatablesSimple" class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>@Html.DisplayNameFor(model => model.First().FirstName)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().LastName)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().UserName)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Image)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().PhoneNumber)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().IsActive)</th>
+                    <th>Roller</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int index = 1;
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(index++)</td>
+                        <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.LastName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                        <td>
+                            @{
+                                string? image = ResolveImageSrc(item.Image);
+                            }
+                            @if (image != null)
+                            {
+                                <a href="@image" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Tam boyutta görüntüle">
+                                    <img class="profil-image mx-auto" src="@image" alt="Profil Fotoğrafı" loading="lazy" />
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                        <td>
+                            <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
+                                @(item.IsActive ? "Evet" : "Hayır")
+                            </span>
+                        </td>
+                        <td>
+                            @{
+                                var userRoles = (ViewBag.UserRoles as Dictionary<int, List<string>>)?[item.Id] ?? new
+                                List<string>();
+                            }
+                            @if (userRoles.Any())
+                            {
+                                @foreach (var role in userRoles)
+                                {
+                                    <span class="badge bg-info me-1">@role</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Detaylar">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="Form" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                <i class="fas fa-pen-to-square"></i>
+                            </a>
+                            <button type="button" class="mt-1 btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="Sil"
+                                    onclick="confirmDelete(@item.Id, '@Html.Raw((item.FirstName + " " + item.LastName).Trim().Replace("'", "\\'"))', 'Kullanıcıyı Sil')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form id="deleteForm" asp-action="Delete" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteItemId" />
+</form>
+
+@section Scripts {
+}

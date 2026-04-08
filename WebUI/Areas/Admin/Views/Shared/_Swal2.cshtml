@@ -1,0 +1,22 @@
+@{
+    var title = TempData["Swal_Title"]?.ToString();
+    var message = TempData["Swal_Message"]?.ToString();
+    var icon = TempData["Swal_Icon"]?.ToString() ?? "info";
+        
+    if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(message))
+    {
+        // \n'leri <br> ile değiştir
+        var htmlMessage = message.Replace("\n", "<br>");
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: @Html.Raw(Json.Serialize(title)),
+                    html: @Html.Raw(Json.Serialize(htmlMessage)),
+                    icon: @Html.Raw(Json.Serialize(icon)),
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Tamam'
+                });
+            });
+        </script>
+    }
+}

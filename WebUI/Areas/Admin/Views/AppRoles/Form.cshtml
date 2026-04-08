@@ -1,0 +1,68 @@
+﻿@model AppRole
+
+@{
+    bool isEdit = Model?.Id > 0;
+    ViewData["Title"] = isEdit ? "Rolü Düzenle" : "Yeni Rol Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <div class="bg-primary bg-opacity-10 rounded p-2">
+        <i class="fas @(isEdit ? "fa-pen-to-square" : "fa-shield-halved") text-primary"></i>
+    </div>
+    <div>
+        <h4 class="mb-0 fw-semibold">@ViewData["Title"]</h4>
+        <small class="text-muted">
+            @(isEdit ? "Rol bilgilerini güncelleyin" : "Yeni rol bilgilerini aşağıya girin")
+        </small>
+    </div>
+</div>
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" method="post">
+    @Html.AntiForgeryToken()
+
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card border">
+                <div class="card-body p-4">
+                    <p class="text-uppercase text-muted fw-semibold small mb-3">Rol Bilgileri</p>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-medium small">
+                            Rol Adı
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Name" class="form-control" placeholder="örn. Admin, Editor" />
+                        <div class="valid-feedback">Güzel!</div>
+                        <span asp-validation-for="Name" class="invalid-feedback"></span>
+                        <small class="text-muted">Normalize ad otomatik oluşturulur.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+        <button type="submit"
+                class="btn @(isEdit ? "btn-outline-success" : "btn-outline-primary") d-flex align-items-center gap-2 fw-semibold">
+            <i class="fas fa-circle-check"></i>
+            @(isEdit ? "Kaydet" : "Ekle")
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

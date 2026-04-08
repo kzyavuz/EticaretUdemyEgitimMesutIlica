@@ -2,11 +2,19 @@ using Core.Entities;
 using Data.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebUI.Helper;
+using WebUI.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<ExcelImportHelper>();
+builder.Services.AddScoped<FileHelper>();
+builder.Services.AddSignalR();
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+var mvc = builder.Services.AddControllersWithViews();
+if (builder.Environment.IsDevelopment())
+    mvc.AddRazorRuntimeCompilation();
 
 // Database
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -40,6 +48,20 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 
 var app = builder.Build();
 
+// Veritabanı migration'ı ve default roller oluştur
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
+    var roles = new[] { "Admin", "SuperAdmin", "Editor" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new AppRole { Name = role });
+        }
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -51,6 +73,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.MapHub<ImportProgressHub>("/importProgress");
 
 app.UseAuthorization();
 

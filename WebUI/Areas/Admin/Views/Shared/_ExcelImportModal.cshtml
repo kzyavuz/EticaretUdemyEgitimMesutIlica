@@ -1,0 +1,282 @@
+<!-- ==================== Excel Upload Dialog Modal ==================== -->
+<div class="modal fade" id="excelUploadModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold">
+                    <i class="fas fa-file-excel me-2 text-success"></i>Excel İçeri Aktar
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+
+                <!-- Sütun bilgileri -->
+                <div class="rounded-3 p-3 mb-3" style="background:#f0f9ff;border:1px solid #bae6fd;">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="fas fa-circle-info text-info mt-1"></i>
+                        <div class="small">
+                            <div id="excelRequiredFields" class="mb-1"></div>
+                            <div id="excelOptionalFields"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drag-drop zone -->
+                <div id="excelDropZone"
+                     class="border border-2 rounded-3 p-4 text-center"
+                     style="border-style:dashed!important;border-color:#ced4da;cursor:pointer;transition:all .2s;"
+                     onclick="document.getElementById('excelFileInputHidden').click()">
+                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2 d-block"></i>
+                    <p class="mb-1">Dosyayı buraya <strong>sürükleyin</strong> veya <strong>tıklayın</strong></p>
+                    <p class="text-muted small mb-0">Yalnızca <code>.xlsx</code> dosyaları kabul edilir</p>
+                </div>
+                <input type="file" id="excelFileInputHidden" accept=".xlsx" class="d-none" />
+
+                <!-- Seçilen dosya göstergesi -->
+                <div id="excelSelectedFile" class="mt-2 d-none">
+                    <div class="d-flex align-items-center gap-2 p-2 rounded-2"
+                         style="background:#f0fdf4;border:1px solid #86efac;">
+                        <i class="fas fa-file-excel text-success"></i>
+                        <span id="excelFileName" class="small fw-semibold text-success flex-grow-1"></span>
+                        <button type="button" id="excelClearFile" class="btn-close" style="font-size:.6rem;"></button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer border-0 pt-0 d-flex justify-content-between align-items-center">
+                <a id="excelSampleDownloadBtn" href="#" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-download me-1"></i>Örnek Dosya İndir
+                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>İptal
+                    </button>
+                    <button type="button" id="excelUploadSaveBtn" class="btn btn-success btn-sm">
+                        <i class="fas fa-upload me-1"></i>Yükle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Import Progress Modal ==================== -->
+<div class="modal fade" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-sync-alt me-2"></i>Excel İçeri Aktarımı</h5>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span id="progressText">Başlanıyor...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div id="statusList" class="small" style="max-height: 300px; overflow-y: auto;">
+                    <div id="statusItem" class="text-muted"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SignalR ve Global Import Functions - Page scripts SONRASINDA -->
+<script>
+    // ========== Upload Dialog Logic ==========
+
+    var _excelImportActionUrl = '';
+    var _excelSelectedFile = null;
+
+    function _showSelectedFile(name) {
+        $('#excelFileName').text(name);
+        $('#excelSelectedFile').removeClass('d-none');
+        $('#excelDropZone').css('border-color', '#16a34a');
+    }
+
+    function _clearSelectedFile() {
+        _excelSelectedFile = null;
+        document.getElementById('excelFileInputHidden').value = '';
+        $('#excelSelectedFile').addClass('d-none');
+        $('#excelDropZone').css('border-color', '#ced4da');
+    }
+
+    function openExcelImportDialog(config) {
+        _excelImportActionUrl = config.actionUrl;
+        _clearSelectedFile();
+
+        // Zorunlu sütunlar
+        var reqHtml = '<span class="fw-semibold text-danger me-1">Zorunlu:</span>';
+        (config.requiredFields || []).forEach(function (f) {
+            reqHtml += '<span class="badge bg-danger me-1 fw-normal">' + f + '</span>';
+        });
+        $('#excelRequiredFields').html(reqHtml);
+
+        // Opsiyonel sütunlar
+        if (config.optionalFields && config.optionalFields.length) {
+            var optHtml = '<span class="fw-semibold text-secondary me-1">Opsiyonel:</span>';
+            config.optionalFields.forEach(function (f) {
+                optHtml += '<span class="badge bg-secondary me-1 fw-normal">' + f + '</span>';
+            });
+            $('#excelOptionalFields').html(optHtml).removeClass('d-none');
+        } else {
+            $('#excelOptionalFields').html('').addClass('d-none');
+        }
+
+        // Örnek dosya butonu
+        if (config.sampleUrl) {
+            $('#excelSampleDownloadBtn').attr('href', config.sampleUrl).removeClass('d-none');
+        } else {
+            $('#excelSampleDownloadBtn').addClass('d-none');
+        }
+
+        new bootstrap.Modal(document.getElementById('excelUploadModal')).show();
+    }
+
+    $(document).ready(function () {
+
+        // Dosya seçimi (input change)
+        $('#excelFileInputHidden').on('change', function () {
+            if (this.files.length) {
+                _excelSelectedFile = this.files[0];
+                _showSelectedFile(_excelSelectedFile.name);
+            }
+        });
+
+        // Dosyayı temizle
+        $('#excelClearFile').on('click', function (e) {
+            e.stopPropagation();
+            _clearSelectedFile();
+        });
+
+        // Yükle butonu
+        $('#excelUploadSaveBtn').on('click', function () {
+            if (!_excelSelectedFile) {
+                Swal.fire('Uyarı', 'Lütfen önce bir Excel dosyası seçin.', 'warning');
+                return;
+            }
+            var uploadModal = bootstrap.Modal.getInstance(document.getElementById('excelUploadModal'));
+            if (uploadModal) uploadModal.hide();
+
+            var formData = new FormData();
+            formData.append('file', _excelSelectedFile);
+            _startExcelImportWithData(formData, _excelImportActionUrl);
+        });
+
+        // Drag & Drop
+        var dz = document.getElementById('excelDropZone');
+
+        dz.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            $(this).css({ 'border-color': '#16a34a', 'background': '#f0fdf4' });
+        });
+        dz.addEventListener('dragleave', function () {
+            $(this).css({ 'background': '' });
+            if (!_excelSelectedFile) $(this).css('border-color', '#ced4da');
+        });
+        dz.addEventListener('drop', function (e) {
+            e.preventDefault();
+            $(this).css('background', '');
+            var files = e.dataTransfer.files;
+            if (files.length) {
+                if (!files[0].name.toLowerCase().endsWith('.xlsx')) {
+                    Swal.fire('Hata', 'Yalnızca <strong>.xlsx</strong> dosyaları kabul edilir.', 'error');
+                    return;
+                }
+                _excelSelectedFile = files[0];
+                _showSelectedFile(_excelSelectedFile.name);
+            }
+        });
+    });
+
+    // ========== Progress Modal Logic ==========
+
+    var progressConnection;
+
+    function initializeImportModal() {
+        if (progressConnection && progressConnection.state === signalR.HubConnectionState.Connected) {
+            return;
+        }
+
+        progressConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/importProgress")
+            .withAutomaticReconnect()
+            .build();
+
+        progressConnection.on("ReceiveProgress", function (data) {
+            $('#progressPercent').text(data.Percentage + '%');
+            $('#progressBar').css('width', data.Percentage + '%').attr('aria-valuenow', data.Percentage);
+            $('#statusItem').append('<div>✓ ' + data.Message + '</div>');
+        });
+
+        progressConnection.on("ReceiveComplete", function (data) {
+            $('#progressPercent').text('100%');
+            $('#progressBar').css('width', '100%').removeClass('progress-bar-animated');
+            var msg = '✓ <strong>' + data.SuccessCount + ' kayıt başarıyla eklendi!</strong>';
+            if (data.TotalErrors > 0) {
+                msg += '<br/><span class="text-danger">⚠ ' + data.TotalErrors + ' hata oluştu</span>';
+            }
+            $('#statusItem').append('<div class="mt-2">' + msg + '</div>');
+            setTimeout(function () {
+                var m = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+                if (m) m.hide();
+                setTimeout(function () { location.reload(); }, 1000);
+            }, 2000);
+        });
+
+        progressConnection.on("ReceiveError", function (errorMsg) {
+            Swal.fire('Hata', errorMsg, 'error');
+            var m = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+            if (m) m.hide();
+        });
+
+        progressConnection.start().catch(function (err) {
+            console.error("SignalR bağlantı hatası:", err);
+        });
+    }
+
+    function _startExcelImportWithData(formData, actionUrl) {
+        initializeImportModal();
+
+        var modal = new bootstrap.Modal(document.getElementById('importModal'));
+        modal.show();
+
+        $('#progressPercent').text('0%');
+        $('#progressBar').css('width', '0%').addClass('progress-bar-animated');
+        $('#progressText').text('Dosya yükleniyor...');
+        $('#statusItem').html('');
+
+        $.ajax({
+            url: actionUrl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log("Import başlatıldı:", response);
+            },
+            error: function (xhr, status, error) {
+                Swal.fire('Hata', 'Import sırasında hata oluştu: ' + error, 'error');
+                var m = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+                if (m) m.hide();
+            }
+        });
+    }
+
+    // Geriye dönük uyumluluk: eski sayfalar hâlâ startExcelImport kullanıyorsa çalışsın
+    function startExcelImport(fileInputId, formId, actionUrl) {
+        var fileInput = document.getElementById(fileInputId);
+        if (!fileInput || !fileInput.files.length) {
+            Swal.fire('Hata', 'Lütfen Excel dosyası seçin', 'error');
+            return;
+        }
+        var formData = new FormData(document.getElementById(formId));
+        _startExcelImportWithData(formData, actionUrl);
+    }
+</script>

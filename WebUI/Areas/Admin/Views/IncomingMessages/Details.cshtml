@@ -1,0 +1,79 @@
+@model IncomingMessage
+
+@{
+    ViewData["Title"] = "Mesaj Detayı";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-envelope-open me-2"></i>Mesaj Detayı</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Geri Dön</a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-envelope me-2"></i>Mesaj İçeriği</span>
+                <span class="badge @(Model.IsRead ? "bg-success" : "bg-warning text-dark")">
+                    @(Model.IsRead ? "Okundu" : "Okunmadı")
+                </span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title mb-1">@Model.Subject</h5>
+                <p class="text-muted small mb-3">
+                    <i class="fas fa-clock me-1"></i>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                </p>
+                <hr />
+                <p class="card-text" style="white-space: pre-wrap;">@Model.Message</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-user me-2"></i>Gönderen Bilgileri
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Ad Soyad</span>
+                        <strong>@Model.Name @Model.Surname</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Email</span>
+                        <a href="mailto:@Model.Email">@Model.Email</a>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Telefon</span>
+                        <a href="tel:@Model.Phone">@Model.Phone</a>
+                    </li>
+                    @if (Model.IsRead && Model.ReadDate.HasValue)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Okunma Tarihi</span>
+                            <span>@Model.ReadDate.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body d-grid gap-2">
+                <a href="mailto:@Model.Email" class="btn btn-outline-primary">
+                    <i class="fas fa-reply me-2"></i>Yanıtla
+                </a>
+                <form id="deleteForm" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-danger w-100"
+                            onclick="confirmDelete(null, '@Html.Raw((Model.Name + " " + Model.Surname).Replace("'", "\\'"))', 'Mesajı Sil')">
+                        <i class="fas fa-trash me-2"></i>Mesajı Sil
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

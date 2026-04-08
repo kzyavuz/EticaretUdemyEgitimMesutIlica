@@ -1,0 +1,162 @@
+@model Category
+
+@{
+    bool isEdit = Model?.Id > 0;
+    ViewData["Title"] = isEdit ? "Kategoriyi Düzenle" : "Yeni Kategori Ekle";
+    Layout = "_AdminLayout";
+}
+
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <div class="bg-primary bg-opacity-10 rounded p-2">
+            <i class="fas @(isEdit ? "fa-folder-pen" : "fa-folder-plus") text-primary"></i>
+        </div>
+        <div>
+            <h4 class="mb-0 fw-semibold">@ViewData["Title"]</h4>
+            <small class="text-muted">
+                @(isEdit ? "Kategori bilgilerini güncelleyin" : "Yeni kategori bilgilerini aşağıya girin")
+            </small>
+        </div>
+    </div>
+
+    <form asp-action="@(isEdit ? "Edit" : "Create")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+        <div class="row g-3 mb-3">
+
+            <div class="col-lg-6">
+                <div class="card border h-100">
+                    <div class="card-body p-4">
+                        <p class="text-uppercase text-muted fw-semibold small mb-3">Temel Bilgiler</p>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-medium small"></label>
+                            <span class="text-danger">*</span>
+                            <input asp-for="Title" class="form-control" placeholder="Kategori Başlığı" />
+                            
+                            <span asp-validation-for="Title" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-medium small"></label>
+                            <textarea asp-for="Description" class="form-control" placeholder="Kategori hakkında kısa bir açıklama..." rows="4"></textarea>
+                            <span asp-validation-for="Description" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ParentId" class="form-label fw-medium small"></label>
+                            <span class="text-danger">*</span>
+                            <select asp-for="ParentId" class="form-select" asp-items="ViewBag.Categories">
+                                <option value="0">Ana Kategori</option>
+                            </select>
+                            <span asp-validation-for="ParentId" class="invalid-feedback"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="OrderNumber" class="form-label fw-medium small"></label>
+                            <input asp-for="OrderNumber" class="form-control" placeholder="0" />
+                            <span asp-validation-for="OrderNumber" class="invalid-feedback"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 d-flex flex-column gap-3">
+
+                <div class="card border flex-grow-1">
+                    <div class="card-body p-4">
+                        @await Html.PartialAsync("_ImageUploadWidget", new ImageUploadWidgetViewModel
+                        {
+                            Label        = "Kategori Görseli",
+                            FieldName    = "Image",
+                            CurrentValue = Model?.Image,
+                            IsEdit       = isEdit
+                        })
+                    </div>
+                </div>
+
+                <div class="card border flex-grow-1">
+                    <div class="card-body p-4">
+                        <p class="text-uppercase text-muted fw-semibold small mb-3">Ayarlar</p>
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div id="toggleSwitch"
+                                 class="bg-success bg-opacity-25 border border-success rounded-pill position-relative flex-shrink-0 status-toggle-button"
+                                 role="button">
+                                <div data-toggle-thumb
+                                     class="shadow-sm toggle-thumb status-toggle-button-circle"></div>
+                            </div>
+                            <div>
+                                <p id="topMenuLabel" class="mb-0 small fw-semibold">Üst Menüde Göster</p>
+                                <p id="topMenuSub" class="mb-0 text-muted small">Üst menüde görünür</p>
+                            </div>
+                        </div>
+                        <input type="checkbox" asp-for="ISTopMenu" id="isTopMenuCheckbox" class="d-none" />
+
+                        <hr class="my-3" />
+
+                        <div class="d-flex align-items-center gap-3">
+                            <div id="toggleSwitch"
+                                 class="bg-success bg-opacity-25 border border-success rounded-pill position-relative flex-shrink-0 status-toggle-button"
+                                 role="button">
+                                <div data-toggle-thumb
+                                     class="shadow-sm toggle-thumb status-toggle-button-circle"></div>
+                            </div>
+                            <div>
+                                <p id="toggleLabel" class="mb-0 small fw-semibold">Aktif</p>
+                                <p id="toggleSub" class="mb-0 text-muted small">Kategori yayında görünür</p>
+                            </div>
+                        </div>
+                        <input type="checkbox" asp-for="IsActive" id="isActiveCheckbox" class="d-none" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Geri Dön
+            </a>
+            <button type="submit"
+                    class="btn @(isEdit ? "btn-outline-success" : "btn-outline-primary") d-flex align-items-center gap-2 fw-semibold">
+                <i class="fas fa-circle-check"></i>
+                @(isEdit ? "Kaydet" : "Ekle")
+            </button>
+        </div>
+
+    </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            FormUtils.ToggleSwitch.init('topMenuSwitch', 'isTopMenuCheckbox', @(Model?.ISTopMenu.ToString().ToLower() ?? "false"), {
+                labelId:       'topMenuLabel',
+                subId:         'topMenuSub',
+                activeLabel:   'Üst Menüde Göster',
+                inactiveLabel: 'Üst Menüde Gösterme',
+                activeSub:     'Üst menüde görünür',
+                inactiveSub:   'Üst menüde görünmez',
+            });
+
+            FormUtils.ToggleSwitch.init('toggleSwitch', 'isActiveCheckbox', @(Model?.IsActive.ToString().ToLower() ?? "true"), {
+                labelId:       'toggleLabel',
+                subId:         'toggleSub',
+                activeLabel:   'Aktif',
+                inactiveLabel: 'Pasif',
+                activeSub:     'Kategori yayında görünür',
+                inactiveSub:   'Kategori yayında görünmez',
+            });
+        });
+    </script>
+}

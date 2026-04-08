@@ -1,0 +1,65 @@
+﻿@model AppRole
+
+@{
+    ViewData["Title"] = "Rol Detayları";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center gap-2">
+        <div class="bg-primary bg-opacity-10 rounded p-2">
+            <i class="fas fa-shield-halved text-primary"></i>
+        </div>
+        <div>
+            <h4 class="mb-0 fw-semibold">Rol Detayları</h4>
+            <small class="text-muted">@Model.Name</small>
+        </div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Geri Dön
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <p class="text-uppercase text-muted fw-semibold small mb-3">Rol Bilgileri</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Rol Adı</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold">
+                            <i class="fas fa-shield-halved me-1"></i>@Model.Name
+                        </span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Normalize Ad</span>
+                        <span>@Model.NormalizedName</span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">ID</span>
+                        <span class="text-muted">#@Model.Id</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 d-grid gap-2">
+                <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="fas fa-pen-to-square me-2"></i>Düzenle
+                </a>
+                <button type="button" class="btn btn-danger"
+                        onclick="confirmDelete(null, '@Html.Raw(Model.Name?.Replace("'", "\\'"))', 'Rolü Sil')">
+                    <i class="fas fa-trash me-2"></i>Sil
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="deleteForm" asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
