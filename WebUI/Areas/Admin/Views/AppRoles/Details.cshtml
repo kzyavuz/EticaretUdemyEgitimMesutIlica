@@ -5,16 +5,11 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div class="d-flex align-items-center gap-2">
-        <div class="bg-primary bg-opacity-10 rounded p-2">
-            <i class="fas fa-shield-halved text-primary"></i>
-        </div>
-        <div>
-            <h4 class="mb-0 fw-semibold">Rol Detayları</h4>
-            <small class="text-muted">@Model.Name</small>
-        </div>
-    </div>
+
+<div class="page-header">
+
+    <partial name="~/Areas/Admin/Views/PartialViews/_Breadcrumb.cshtml" model="@ViewBag.Breadcrumbs" />
+
     <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left me-1"></i>Geri Dön
     </a>
@@ -48,10 +43,10 @@
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4 d-grid gap-2">
-                <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-warning">
+                <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-outline-warning">
                     <i class="fas fa-pen-to-square me-2"></i>Düzenle
                 </a>
-                <button type="button" class="btn btn-danger"
+                <button type="button" class="btn btn-outline-danger"
                         onclick="confirmDelete(null, '@Html.Raw(Model.Name?.Replace("'", "\\'"))', 'Rolü Sil')">
                     <i class="fas fa-trash me-2"></i>Sil
                 </button>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Abstract;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
 {
@@ -38,5 +39,7 @@ namespace Core.Entities
         [Display(Name = "Marka")]
         public int? BrandId { get; set; }
         public Brand? Brand { get; set; }
+
+        public ICollection<Favories>? Favories { get; set; }
     }
 }

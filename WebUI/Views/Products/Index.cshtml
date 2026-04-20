@@ -1,0 +1,197 @@
+﻿@model IEnumerable<Product>
+
+@{
+    ViewData["Title"] = "Ürün Listesi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/components/product_filter.css" />
+}
+
+<section class="page-hero">
+    <div class="page-hero-grid" aria-hidden="true"></div>
+    <div class="container">
+        <div class="page-hero-inner">
+            <div class="page-hero-eyebrow">
+                <i class="fa fa-boxes-stacked" aria-hidden="true"></i> Ürün
+                Kataloğu
+            </div>
+            <h1 class="page-hero-title">Ürünlerimiz</h1>
+            <p class="page-hero-sub">
+                Plastik ekstrüzyon ve kauçuk üretiminde 20+ yıllık deneyimle
+                yüksek kaliteli ürünler sunuyoruz.
+            </p>
+        </div>
+        <span class="page-hero-bg-num" aria-hidden="true">01</span>
+    </div>
+</section>
+
+<section class="sec bg-theme visible overflow-unset"
+         aria-label="Ürün Listesi">
+    <div class="container">
+
+        <div class="filter-area d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4 mt-2">
+            <div class="d-flex align-items-center gap-10 flex-wrap">
+                <button class="fd-btn-open" onclick="openFilter()" aria-label="Filtreleri Aç">
+                    <i class="fa fa-sliders" aria-hidden="true"></i> Filtrele
+                    <span class="bg-primary text-white query-area" aria-label="3 filtre aktif">3</span>
+                </button>
+                <span class="fs-sm text-muted count-span"><strong class="text-primary">@ViewBag.Count</strong> ürün</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <!-- Görünüm Seçimi -->
+                <div class="d-flex gap-2" role="group" aria-label="Görünüm seçimi">
+                    <button class="nav-icon-btn active"
+                            id="prodGrid"
+                            onclick="setView('grid', 'productGrid', 'prod')"
+                            title="Izgara görünümü"
+                            aria-pressed="true">
+                        <i class="fa fa-grip" aria-hidden="true"></i>
+                    </button>
+                    <button class="nav-icon-btn"
+                            id="prodTable"
+                            onclick="setView('table', 'productGrid', 'prod')"
+                            title="Tablo görünümü"
+                            aria-pressed="false">
+                        <i class="fa fa-table" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <!-- Sıralama -->
+                <div class="blog-sort-wrap" id="prodSortWrap">
+                    <button class="blog-sort-btn"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            id="prodSortBtn">
+                        <i class="fa fa-arrow-up-wide-short" aria-hidden="true"></i>
+                        <span id="prodSortLabel">Sırala</span>
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="blog-sort-dropdown" role="listbox">
+                        <div class="blog-sort-opt" onclick="sortItems('az', 'productGrid', '.product-item', '.prod-card-title')" role="option">
+                            <i class="fa fa-arrow-down-a-z" aria-hidden="true"></i> A → Z
+                        </div>
+                        <div class="blog-sort-opt" onclick="sortItems('za', 'productGrid', '.product-item', '.prod-card-title')" role="option">
+                            <i class="fa fa-arrow-up-z-a" aria-hidden="true"></i> Z → A
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar kapsayıcısı -->
+        <div class="product-layout">
+
+            <div class="filter-scrim" id="filterScrim" onclick="closeFilter()"></div>
+
+            <div class="filter-drawer"
+                 id="filterDrawer"
+                 role="dialog"
+                 aria-label="Ürün Filtrele">
+                <div class="fd-head">
+                    <span class="fd-title">
+                        <i class="fa fa-sliders text-primary me-2"
+                           aria-hidden="true"></i>Filtrele
+                    </span><button class="fd-close"
+                               onclick="closeFilter()"
+                               aria-label="Filtreyi Kapat">
+                    <i class="fa fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="fd-body">
+                <div class="fd-section">
+                    <div class="fd-sec-title">Kategori</div>
+
+                    <div class="fd-content">
+                        <div class="fd-row">
+                            <label>
+                                <div class="label_area">
+                                    <input type="radio" name="fcat" checked />
+                                    Tümü
+                                </div>
+                                <span class="fd-cnt">13</span>
+                            </label>
+                        </div>
+
+                        <div class="fd-row">
+                            <label>
+                                <div class="label_area">
+                                    <input type="radio" name="fcat" />
+                                    Alüminyum Fitilleri
+                                </div>
+                                <span class="fd-cnt">1</span>
+                            </label>
+                        </div>
+                        <div class="fd-row">
+                            <label>
+                                <div class="label_area">
+                                    <input type="radio" name="fcat" />
+                                    Çelik Kapı Fitilleri
+                                </div>
+                                <span class="fd-cnt">2</span>
+                            </label>
+                        </div>
+                        <div class="fd-row">
+                            <label>
+                                <div class="label_area">
+                                    <input type="radio" name="fcat" />
+                                    Enjeksiyon
+                                </div>
+                                <span class="fd-cnt">1</span>
+                            </label>
+                        </div>
+                        <div class="fd-row">
+                            <label>
+                                <div class="label_area">
+                                    <input type="radio" name="fcat" />
+                                    Hortum
+                                </div>
+                                <span class="fd-cnt">1</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="fd-section">
+                    <div class="fd-sec-title">Malzeme</div>
+                    <div class="fd-mat">
+                        <button class="fd-mat-btn on">TPE</button><button class="fd-mat-btn">PVC</button><button class="fd-mat-btn">Kauçuk</button>
+                        <button class="fd-mat-btn">NBR</button><button class="fd-mat-btn">POM</button><button class="fd-mat-btn">EPDM</button>
+                    </div>
+                </div>
+            </div>
+            <div class="fd-footer">
+                <button class="btn-p flex-1 fs-13px"
+                        onclick="closeFilter()">
+                    <i class="fa fa-check" aria-hidden="true"></i> Uygula
+                </button><button class="btn-o fs-13px"
+                             onclick="closeFilter()">
+                Sıfırla
+            </button>
+        </div>
+    </div>
+
+    <div class="product-content">
+
+        <div class="row g-2 g-md-3" id="productGrid">
+
+            @if (Model == null || !Model.Any())
+            {
+                <p class="text-center text-muted">Gösterilecek ürün bulunamadı.</p>
+            }
+            else
+            {
+                @Html.AntiForgeryToken()
+                @foreach (Product item in Model)
+                {
+                    <div class="product-item col-6 col-md-4 col-lg-6 col-xl-4" data-aos="fade-up">
+                        @await Component.InvokeAsync("ProductCard", new { product = item })
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+</div>
+</section>
+

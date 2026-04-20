@@ -1,4 +1,4 @@
-@model WebUI.Models.ImageUploadWidgetViewModel
+@model ImageUploadWidgetViewModel
 
 @{
     var prefix        = Model.FieldName;
@@ -87,7 +87,7 @@
     <img id="@filePreviewId" src=""
          class="img-fluid rounded border d-block mx-auto" style="max-height:120px;" alt="Dosya Önizleme" />
     <div class="text-center mt-1">
-        <button type="button" class="btn btn-danger btn-sm"
+        <button type="button" class="btn btn-outline-danger btn-sm"
                 onclick="FormUtils.clearFileInput('@fileInputId','@filePreviewId','@fileWrapId','@placeholderId')">
             <i class="fas fa-times me-1"></i> Seçimi Kaldır
         </button>

@@ -1,35 +1,49 @@
-ï»¿@model IEnumerable<AppUser>
+@model IEnumerable<AppUser>
 
 @{
-    ViewData["Title"] = "KullanÄ±cÄ±lar";
+    ViewData["Title"] = "Kullanýcýlar";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-users me-2"></i>KullanÄ±cÄ± YÃ¶netimi</h1>
-    <a asp-action="Form" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
-       title="Yeni admin eklemek iÃ§in tÄ±klayÄ±n"><i class="fas fa-circle-plus me-2"></i>Yeni KullanÄ±cÄ± Ekle</a>
+<div class="page-header">
+
+    <partial name="~/Areas/Admin/Views/PartialViews/_Breadcrumb.cshtml" model="@ViewBag.Breadcrumbs" />
+
+    <a asp-action="Form" class="btn-nx primary" data-bs-toggle="tooltip" data-bs-placement="top"
+       title="Yeni kullanýcý eklemek için týklayýn">
+        <i class="fas fa-plus"></i>Kullanýcý Ekle
+    </a>
 </div>
 
-<div class="card mb-4">
-    <div class="card-header">
-        <i class="fas fa-table me-1"></i>
-        KullanÄ±cÄ± Listesi
+<partial name="_Spinner" />
+
+@* Aktif Paisf verilerin sayýsý *@
+<partial name="~/Areas/Admin/Views/PartialViews/_StartCard.cshtml" model="@ViewBag.StartCards" />
+
+<div class="card-nx mb-4">
+
+    <div class="bulk-action-bar">
+        <span>
+            <span class="bulk-count">0</span>
+            marka seçildi
+        </span>
+        <div class="bulk-action-buttons">
+            <button class="btn-nx danger-btn sm">
+                <i class="fas fa-trash"></i> Sil
+            </button>
+        </div>
     </div>
-    <div class="card-body" style="overflow: visible;">
-        <table id="datatablesSimple" class="table table-striped table-hover">
+
+    <div class="table-container">
+        <table id="dataTable" class="table-nx nowrap" width="100%">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>@Html.DisplayNameFor(model => model.First().FirstName)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().LastName)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().UserName)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().Image)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().FullName)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Email)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().PhoneNumber)</th>
                     <th>@Html.DisplayNameFor(model => model.First().IsActive)</th>
                     <th>Roller</th>
-                    <th>Ä°ÅŸlemler</th>
+                    <th class="text-end">Ýþlemler</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,32 +52,28 @@
                 }
                 @foreach (var item in Model)
                 {
+                    string? imageSrc = ResolveImageSrc(item.Image);
                     <tr>
                         <td>@(index++)</td>
-                        <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
-                        <td>@Html.DisplayFor(modelItem => item.LastName)</td>
-                        <td>@Html.DisplayFor(modelItem => item.UserName)</td>
                         <td>
-                            @{
-                                string? image = ResolveImageSrc(item.Image);
-                            }
-                            @if (image != null)
-                            {
-                                <a href="@image" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
-                                       title="Tam boyutta gÃ¶rÃ¼ntÃ¼le">
-                                    <img class="profil-image mx-auto" src="@image" alt="Profil FotoÄŸrafÄ±" loading="lazy" />
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="text-muted">-</span>
-                            }
+
+                            <div class="product-cell">
+                                <div class="product-thumb">
+                                    <a href="@imageSrc" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="Tam boyutta görüntüle" class="table-image-link">
+                                        <img class="table-image" src="@imageSrc" alt="Ürün Görseli" loading="lazy" />
+                                    </a>
+                                </div>
+                                <div>
+                                    <div class="product-name">@item.FullName</div>
+                                    <div class="product-sku">@item.UserName</div>
+                                </div>
+                            </div>
                         </td>
                         <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                        <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
                         <td>
                             <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
-                                @(item.IsActive ? "Evet" : "HayÄ±r")
+                                @(item.IsActive ? "Evet" : "Hayýr")
                             </span>
                         </td>
                         <td>
@@ -83,20 +93,22 @@
                                 <span class="text-muted">-</span>
                             }
                         </td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info"
+                        <td class="dt-type-numeric">
+                            <div class="action-btns">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn-icon info"
                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Detaylar">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a asp-action="Form" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"
-                                   data-bs-toggle="tooltip" data-bs-placement="top" title="DÃ¼zenle">
-                                <i class="fas fa-pen-to-square"></i>
-                            </a>
-                            <button type="button" class="mt-1 btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" title="Sil"
-                                    onclick="confirmDelete(@item.Id, '@Html.Raw((item.FirstName + " " + item.LastName).Trim().Replace("'", "\\'"))', 'KullanÄ±cÄ±yÄ± Sil')">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a asp-action="Form" asp-route-id="@item.Id" class="btn-icon warning"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </a>
+                                <button type="button" class="btn-icon danger" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Sil"
+                                        onclick="confirmDelete(@item.Id, '@Html.Raw(item.FullName.Replace("'", "\\'"))', 'Kullanýcýyý Sil')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -109,6 +121,3 @@
     @Html.AntiForgeryToken()
     <input type="hidden" name="id" id="deleteItemId" />
 </form>
-
-@section Scripts {
-}

@@ -1,0 +1,118 @@
+/* ======================================================
+   14. PAGE HERO
+====================================================== */
+.breadcrumb-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 13px 0
+}
+
+.bc-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: var(--fs-xs);
+    color: var(--text-muted)
+}
+
+.bc-inner a {
+    color: var(--text-muted);
+    transition: color .2s
+}
+
+.bc-inner a:hover {
+    color: var(--primary)
+}
+
+.bc-inner .active {
+    color: var(--primary);
+    font-weight: 600
+}
+
+.bc-sep {
+    opacity: .4;
+    font-size: 9px
+}
+
+.page-hero {
+    padding: 64px 0 52px;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border)
+}
+
+.page-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 55% 90% at 85% 50%, rgba(var(--primary-rgb), 0.09) 0%, transparent 60%), radial-gradient(ellipse 35% 50% at 5% 90%, rgba(var(--accent-rgb), 0.06) 0%, transparent 55%)
+}
+
+.page-hero-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .35;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 90% 100% at 85% 50%, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 100% at 85% 50%, black 30%, transparent 70%)
+}
+
+.page-hero-inner {
+    position: relative;
+    z-index: 1
+}
+
+.page-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 13px;
+    background: rgba(var(--primary-rgb), 0.1);
+    border: 1px solid rgba(var(--primary-rgb), 0.25);
+    border-radius: var(--r-full);
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 14px
+}
+
+.page-hero-title {
+    font-size: clamp(30px, 5vw, 54px);
+    color: var(--heading);
+    margin: 0 0 10px;
+    line-height: 1.1
+}
+
+.page-hero-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 440px;
+    line-height: 1.72
+}
+
+.page-hero-bg-num {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: clamp(80px, 14vw, 170px);
+    font-weight: 700;
+    color: rgba(var(--primary-rgb), 0.04);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.05em
+}
+
+@media(max-width:767px) {
+    .page-hero-bg-num {
+        display: none
+    }
+}

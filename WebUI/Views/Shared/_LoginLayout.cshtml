@@ -1,0 +1,92 @@
+﻿
+<!DOCTYPE html>
+
+<html lang="tr" data-theme="dark" data-radius="sharp" data-font="poppins">
+
+<head>
+    <partial name="~/Views/PartialViews/_Head.cshtml" />
+    <link href="~/css/page/auth.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+</head>
+
+
+<body>
+
+    @await Component.InvokeAsync("Header")
+
+    <partial name="~/Views/PartialViews/_ThemeSettings.cshtml" />
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+
+    @await Component.InvokeAsync("Footer")
+
+    <partial name="~/Views/PartialViews/_Script.cshtml" />
+    
+    <script>
+            document.addEventListener("DOMContentLoaded", function () {
+    
+                // --- 1. ŞİFRE GÖSTER/GİZLE FONKSİYONU ---
+                function setupPwToggle(btnId, inputId, iconId) {
+                    const btn = document.getElementById(btnId);
+                    const input = document.getElementById(inputId);
+                    const icon = document.getElementById(iconId);
+
+                    if (btn && input && icon) {
+                        btn.addEventListener('click', function () {
+                            const isPassword = input.type === 'password';
+                            input.type = isPassword ? 'text' : 'password';
+                            // İkon değiştirme
+                            icon.classList.toggle('fa-eye', !isPassword);
+                            icon.classList.toggle('fa-eye-slash', isPassword);
+                        });
+                    }
+                }
+
+                // SignIn sayfası için toggle
+                setupPwToggle('pwToggle', 'Password', 'pwToggleIcon');
+    
+                // SignUp sayfası için toggle'lar
+                setupPwToggle('pw1Toggle', 'Password', 'pw1Icon');
+                setupPwToggle('pw2Toggle', 'ConfirmPassword', 'pw2Icon');
+
+
+                // --- 2. ŞİFRE GÜÇ GÖSTERGESİ (Sadece Kayıt Sayfası) ---
+                const pwInput = document.getElementById('Password');
+                const fill = document.getElementById('pwStrengthFill');
+                const text = document.getElementById('pwStrengthText');
+
+                if (pwInput && fill) {
+                    pwInput.addEventListener('input', function () {
+                        const val = this.value;
+                        if (!val) {
+                            fill.className = 'pw-strength-fill';
+                            text.textContent = '';
+                            return;
+                        }
+
+                        let score = 0;
+                        if (val.length >= 8) score++;
+                        if (/[A-Z]/.test(val)) score++;
+                        if (/[0-9]/.test(val)) score++;
+                        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+                        const levels = ['', 'pw-weak', 'pw-fair', 'pw-good', 'pw-strong'];
+                        const labels = ['', 'Zayıf', 'Orta', 'İyi', 'Güçlü'];
+                        const colors = ['', '#ef4444', '#f59e0b', '#3b82f6', '#34d399'];
+
+                        fill.className = 'pw-strength-fill ' + (levels[score] || '');
+                        text.textContent = labels[score] || '';
+                        text.style.color = colors[score] || '';
+                    });
+                }
+            });
+    </script>
+    @RenderSection("Scripts", required: false)
+
+    <partial name="~/Views/PartialViews/_Swal2.cshtml" />
+</body>
+
+</html>

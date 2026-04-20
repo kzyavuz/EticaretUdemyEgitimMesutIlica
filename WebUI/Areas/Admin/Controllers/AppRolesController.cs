@@ -1,10 +1,10 @@
 ﻿using Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WebUI.Areas.Admin.Models;
 
 namespace WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
     public class AppRolesController : AdminBaseController
     {
         private readonly RoleManager<AppRole> _roleManager;
@@ -17,6 +17,13 @@ namespace WebUI.Areas.Admin.Controllers
         public IActionResult Index()
         {
             var roles = _roleManager.Roles.ToList();
+
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Roller" }
+            };
+            ViewBag.Breadcrumbs = breadcrumbs;
+
             return View(roles);
         }
 
@@ -24,16 +31,36 @@ namespace WebUI.Areas.Admin.Controllers
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
             if (role == null) return NotFound();
+
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Roller", Controller = "AppRoles", Action = "Index" },
+                new BreadcrumbItem { Title = role.Name }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
             return View(role);
         }
 
         public async Task<IActionResult> Form(int? id)
         {
-            if (id == null) return View(new AppRole());
+            AppRole? data = new();
 
-            var role = await _roleManager.FindByIdAsync(id.ToString());
-            if (role == null) return NotFound();
-            return View(role);
+            if (id.HasValue)
+            {
+                data = await _roleManager.FindByIdAsync(id.Value.ToString());
+                if (data == null) return NotFound();
+            }
+
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Roller", Controller = "AppRoles", Action = "Index" },
+                new BreadcrumbItem { Title = data.Name ?? "Yeni Rol" }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+            return View(data);
         }
 
         [HttpPost]

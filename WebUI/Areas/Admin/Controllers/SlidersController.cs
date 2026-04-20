@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Core.Entities;
+﻿using Core.Entities;
+using Service.Extensions;
 using Data.Context;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebUI.Areas.Admin.Models;
 using WebUI.Helper;
 
 namespace WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
     public class SlidersController : AdminBaseController
     {
         private readonly DatabaseContext _context;
@@ -25,46 +26,91 @@ namespace WebUI.Areas.Admin.Controllers
         // GET: Admin/Sliders
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Sliders.ToListAsync());
+            List<Slider>? data = await _context.Sliders
+                .OrderByDescending(b => b.CreatedDate)
+                .ToListAsync();
+
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Sliderlar"}
+            };
+
+            List<StartCardModel> startCards = new()
+            {
+                new StartCardModel
+                {
+                    Title = "Tüm Sliderlar",
+                    Value = data.Count,
+                    Class = "info",
+                    Tooltip = "Sitede bulunan toplam slider sayısı",
+                    Icon = "fa-solid fa-list"
+                },
+                new StartCardModel
+                {
+                    Title = "Aktif Sliderlar",
+                    Value = data.Count(p => FunctionHelper.IsActive(p.Status)),
+                    Class = "success",
+                    Tooltip = "Sitede aktif durumda olan slider sayısı",
+                    Icon = "fa-solid fa-check"
+                },
+                new StartCardModel
+                {
+                    Title = "Taslak Sliderlar",
+                    Value = data.Count(p => FunctionHelper.IsDraft(p.Status)),
+                    Class = "secondary",
+                    Tooltip = "Sitede taslak durumda olan slider sayısı",
+                    Icon = "fa-solid fa-file"
+                }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+            ViewBag.StartCards = startCards;
+
+            return View(data);
         }
 
-        [HttpPost]
-        public Task<IActionResult> ImportExcel(IFormFile file)
-            => ExcelImport(file, _excelHelper.ImportSlidersAsync,
-                (s, u) => $"{s} slider eklendi, {u} slider güncellendi.");
-
-        [HttpGet]
-        public IActionResult DownloadSampleExcel()
-            => DownloadSampleExcel("sliderlar_ornek.xlsx",
-                new[] {
-                    ("title", true),
-                    ("description", false),
-                    ("image", false),
-                    ("link", false),
-                    ("isactive", false),
-                    ("sira_numarasi", false)
-                },
-                new object[] { "Örnek Slider Başlığı", "Slider alt yazısı", "", "/urunler", "evet", 1 });
-
         // GET: Admin/Sliders/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
+            Slider? data = await _context.Sliders
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-            var slider = await _context.Sliders.FirstOrDefaultAsync(m => m.Id == id);
-            if (slider == null) return NotFound();
+            if (data == null)
+            {
+                return NotFound();
+            }
 
-            return View(slider);
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Sliderlar", Controller= "Sliders", Action = "Index" },
+                new BreadcrumbItem { Title = data.Title }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
+            return View(data);
         }
 
         public async Task<IActionResult> Form(int? id)
         {
-            if (id == null) return View();
+            Slider? data = new();
 
-            var slider = await _context.Sliders.FindAsync(id);
-            if (slider == null) return NotFound();
+            if (id.HasValue)
+            {
+                data = await _context.Sliders.FindAsync(id);
+                if (data == null)
+                    return NotFound();
+            }
 
-            return View(slider);
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Sliderlar", Controller= "Sliders", Action = "Index" },
+                new BreadcrumbItem { Title = data?.Title ?? "Yeni Slider" }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
+            return View(data);
         }
 
         [HttpPost]
@@ -135,6 +181,45 @@ namespace WebUI.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkDelete(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                SetSweetAlertMessage("Hata", "Silinecek kayıt seçilmedi.", "error");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var items = await _context.Sliders.Where(s => ids.Contains(s.Id)).ToListAsync();
+            foreach (var item in items)
+                if (!string.IsNullOrEmpty(item.Image))
+                    _fileHelper.Delete(item.Image);
+
+            _context.Sliders.RemoveRange(items);
+            await _context.SaveChangesAsync();
+
+            SetSweetAlertMessage("Başarılı", $"{items.Count} slider silindi.", "success");
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public Task<IActionResult> ImportExcel(IFormFile file)
+            => ExcelImport(file, _excelHelper.ImportSlidersAsync,
+                (s, u) => $"{s} slider eklendi, {u} slider güncellendi.");
+
+        [HttpGet]
+        public IActionResult DownloadSampleExcel()
+            => DownloadSampleExcel("sliderlar_ornek.xlsx",
+                new[] {
+                    (DisplayName<Slider>(nameof(Slider.Title)), true),
+                    (DisplayName<Slider>(nameof(Slider.Description)), false),
+                    (DisplayName<Slider>(nameof(Slider.Image)), false),
+                    ("Bağlantı", false),
+                    (DisplayName<Slider>(nameof(Slider.Status)), false),
+                    (DisplayName<Slider>(nameof(Slider.OrderNumber)), false)
+                },
+                new object[] { "Örnek Slider Başlığı", "Slider alt yazısı", "", "/urunler", "Aktif", 1 });
         private bool SliderExists(int id)
         {
             return _context.Sliders.Any(e => e.Id == id);

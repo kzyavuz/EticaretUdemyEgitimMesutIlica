@@ -1,0 +1,225 @@
+<!-- SETTINGS FAB -->
+<button
+    class="settings-fab"
+    id="settingsFab"
+    onclick="toggleSettings()"
+    title="Genel Ayarlar"
+    aria-label="Genel Ayarlar">
+    <i class="fa-solid fa-gear" aria-hidden="true"></i>
+</button>
+
+<div
+    class="settings-scrim"
+    id="settingsScrim"
+    onclick="toggleSettings()"></div>
+
+<!-- SETTINGS PANEL -->
+<div
+    class="settings-panel"
+    id="settingsPanel"
+    role="dialog"
+    aria-label="Genel Ayarlar">
+    <div class="sp-head">
+        <span class="sp-title">Genel Ayarlar</span>
+        <button class="sp-close" onclick="toggleSettings()" aria-label="Kapat">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="sp-body">
+        <div class="sp-section">
+            <div class="sp-sec-title">Dil</div>
+            <div class="sp-lang-dd" id="spLangDd">
+                <button class="sp-lang-trigger" id="spLangTrigger" type="button" onclick="toggleLangDd()" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="sp-lang-ti-flag" id="spLangTiFlag">🇹🇷</span>
+                    <span class="sp-lang-ti-name" id="spLangTiName">Türkçe</span>
+                    <i class="fa fa-chevron-down sp-lang-chev" id="spLangChev" aria-hidden="true"></i>
+                </button>
+                <ul class="sp-lang-menu" id="spLangMenu" role="listbox" aria-label="Dil Seç">
+                    <li class="sp-lang-opt active" role="option" data-value="tr" data-flag="🇹🇷" data-name="Türkçe" onclick="pickLang(this)">
+                        <span class="sp-lang-opt-flag">🇹🇷</span>
+                        <span>🇹🇷 Türkçe</span>
+                        <i class="fa fa-check sp-lang-check"></i>
+                    </li>
+                    <li class="sp-lang-opt" role="option" data-value="en" data-flag="🇬🇧" data-name="İngilizce" onclick="pickLang(this)">
+                        <span>🇬🇧 İngilizce</span>
+                        <i class="fa fa-check sp-lang-check"></i>
+                    </li>
+                    <li class="sp-lang-opt" role="option" data-value="de" data-flag="🇩🇪" data-name="Almanca" onclick="pickLang(this)">
+                        <span>🇩🇪 Almanca</span>
+                        <i class="fa fa-check sp-lang-check"></i>
+                    </li>
+                    <li class="sp-lang-opt" role="option" data-value="ar" data-flag="🇸🇦" data-name="Arapça" onclick="pickLang(this)">
+                        <span>🇸🇦 Arapça</span>
+                        <i class="fa fa-check sp-lang-check"></i>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sp-section">
+            <div class="sp-sec-title">Renk Teması</div>
+            <div class="theme-grid" role="radiogroup" aria-label="Renk Teması">
+                <div
+                    class="theme-tile on"
+                    data-tile="dark"
+                    onclick="setTheme('dark', this)"
+                    role="radio"
+                    aria-checked="true"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="dark"></div>
+                    Dark
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="light"
+                    onclick="setTheme('light', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="light"></div>
+                    Light
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="navy"
+                    onclick="setTheme('navy', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="navy"></div>
+                    Navy
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="warm"
+                    onclick="setTheme('warm', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="warm"></div>
+                    Warm
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="emerald"
+                    onclick="setTheme('emerald', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="emerald"></div>
+                    Emerald
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="carbon"
+                    onclick="setTheme('carbon', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="carbon"></div>
+                    Carbon
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="turkish"
+                    onclick="setTheme('turkish', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="turkish"></div>
+                    🇹🇷 TR
+                </div>
+                <div
+                    class="theme-tile"
+                    data-tile="sunset"
+                    onclick="setTheme('sunset', this)"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex="0">
+                    <div class="theme-dot" data-dot="sunset"></div>
+                    Sunset
+                </div>
+            </div>
+        </div>
+        <div class="sp-section">
+            <div class="sp-sec-title">Yazı Tipi</div>
+            <div class="sp-font-grid">
+                <button class="sp-font-btn font-poppins on"
+                    data-font="poppins"
+                    onclick="setFont('poppins', this)">
+                    <span class="sp-font-preview">Aa</span>
+                    Poppins
+                </button>
+
+                <button class="sp-font-btn font-sora"
+                    data-font="sora"
+                    onclick="setFont('sora', this)">
+                    <span class="sp-font-preview">Aa</span>
+                    Sora
+                </button>
+
+                <button class="sp-font-btn font-nunito"
+                    data-font="nunito"
+                    onclick="setFont('nunito', this)">
+                    <span class="sp-font-preview">Aa</span>
+                    Nunito
+                </button>
+
+                <button class="sp-font-btn font-outfit"
+                    data-font="outfit"
+                    onclick="setFont('outfit', this)">
+                    <span class="sp-font-preview">Aa</span>
+                    Outfit
+                </button>
+
+                <button class="sp-font-btn font-roboto-slab"
+                    data-font="roboto-slab"
+                    onclick="setFont('roboto-slab', this)">
+                    <span class="sp-font-preview">Aa</span>
+                    Roboto Slab
+                </button>
+            </div>
+        </div>
+        <div class="sp-section">
+            <div class="sp-sec-title">Köşe Yuvarlama</div>
+            <div class="sp-pills">
+                <button
+                    class="sp-pill"
+                    data-r="sharp"
+                    onclick="setRadius('sharp', this)">
+                    Keskin
+                </button>
+                <button class="sp-pill" data-r="sm" onclick="setRadius('sm', this)">
+                    Küçük
+                </button>
+                <button
+                    class="sp-pill on"
+                    data-r="md"
+                    onclick="setRadius('md', this)">
+                    Orta
+                </button>
+                <button class="sp-pill" data-r="lg" onclick="setRadius('lg', this)">
+                    Büyük
+                </button>
+                <button
+                    class="sp-pill"
+                    data-r="pill"
+                    onclick="setRadius('pill', this)">
+                    Yuvarlak
+                </button>
+            </div>
+        </div>
+        <div class="sp-section">
+            <button class="sp-reset" onclick="resetSettings()">
+                <i class="fa fa-rotate-left" aria-hidden="true"></i> Varsayılana
+                Sıfırla
+            </button>
+        </div>
+        <div class="pt-12 border-t">
+            <p class="fs-11px text-muted lh-1-7">
+                Tüm ayarlar CSS
+                <code class="text-primary fs-10px">custom properties</code>
+                tabanlıdır.
+            </p>
+        </div>
+    </div>
+</div>

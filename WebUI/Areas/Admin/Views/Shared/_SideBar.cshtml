@@ -1,63 +1,163 @@
-﻿<div id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-        <div class="sb-sidenav-menu">
-            <div class="nav">
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-logo">K</div>
+        <div class="brand-text">
+            <div class="brand-name">KOZLOW</div>
+            <div class="brand-sub">E-Ticaret</div>
+        </div>
+    </div>
 
-                <div class="sb-sidenav-menu-heading">Ana Yer</div>
+    <nav class="sidebar-nav">
+        <!-- Ana -->
+        <span class="nav-section-label">Ana Menü</span>
 
-                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Dashboard
-                </a>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-border-all"></i></span>
+                <span>Dashboard</span>
+            </a>
+        </div>
 
-                <a class="nav-link" asp-controller="AppUsers" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
-                    Kullanıcılar
-                </a>
+        <!-- E-Ticaret -->
+        <span class="nav-section-label">E-Ticaret</span>
 
-                <a class="nav-link" asp-controller="AppRoles" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-user-shield"></i></div>
-                    Roller
-                </a>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-box"></i></span>
+                <span>Ürünler</span>
+            </a>
+        </div>
 
-                <div class="sb-sidenav-menu-heading">Ürünler </div>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-tags"></i></span>
+                <span>Kategoriler</span>
+            </a>
+        </div>
 
-                <a class="nav-link" asp-controller="Brands" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
-                    Markalar
-                </a>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Brands" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-copyright"></i></span>
+                <span>Markalar</span>
+            </a>
+        </div>
 
-                <a class="nav-link" asp-controller="Categories" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
-                    Kategoriler
-                </a>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="News" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-newspaper"></i></span>
+                <span>Kampanyalar</span>
+            </a>
+        </div>
 
-                <a class="nav-link" asp-controller="Products" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
-                    Ürünler
-                </a>
+        <!-- İçerik -->
+        <span class="nav-section-label">İçerik</span>
 
-                <a class="nav-link" asp-controller="Orders" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                    Siparişler
-                </a>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Sliders" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-images"></i></span>
+                <span>Slider</span>
+            </a>
+        </div>
 
-                <div class="sb-sidenav-menu-heading">İçerikler </div>
-                
-                <a class="nav-link" asp-controller="News" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-newspaper"></i></div>
-                    Haberler
-                </a>
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="IncomingMessages" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-comments"></i></span>
+                <span>Gelen Mesajlar</span>
+            </a>
+        </div>
 
-                <a class="nav-link" asp-controller="Sliders" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-sliders-h"></i></div>
-                    Sliderlar
-                </a>
+        <!-- Yönetim -->
+        <span class="nav-section-label">Yönetim</span>
+
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
+                <span>Siparişler</span>
+                <span class="nav-badge danger">12</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Customers" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-users"></i></span>
+                <span>Müşteriler</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Adresses" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-map-marker-alt"></i></span>
+                <span>Adres Bilgileri</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Coupons" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-percent"></i></span>
+                <span>İndirim Kuponları</span>
+            </a>
+        </div>
+
+        <!-- Analitik -->
+        <span class="nav-section-label">Analitik</span>
+
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Reports" asp-action="Sales">
+                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                <span>Satış Raporları</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Reports" asp-action="Traffic">
+                <span class="nav-icon"><i class="fas fa-arrow-trend-up"></i></span>
+                <span>Trafik Analizi</span>
+            </a>
+        </div>
+
+        <!-- Kullanıcı & Ayarlar -->
+        <span class="nav-section-label">Kullanıcı & Ayarlar</span>
+
+        <div class="nav-item nav-has-sub">
+            <a class="nav-link" href="#">
+                <span class="nav-icon"><i class="fas fa-users-gear"></i></span>
+                <span>Kullanıcılar</span>
+                <span class="nav-arrow">›</span>
+            </a>
+            <div class="nav-sub">
+                <div class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AppUsers" asp-action="Index">
+                        <span class="nav-icon"><i class="fas fa-user"></i></span>
+                        <span>Kullanıcı Listesi</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="AppRoles" asp-action="Index">
+                        <span class="nav-icon"><i class="fas fa-shield-halved"></i></span>
+                        <span>Roller</span>
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="sb-sidenav-footer">
-            <div class="small">V 1.0</div>
-            Admin Paneli
+
+        <div class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Settings" asp-action="Index">
+                <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                <span>Ayarlar</span>
+            </a>
         </div>
+
     </nav>
-</div>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">AY</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">Ahmet Yılmaz</div>
+                <div class="sidebar-user-role">Süper Admin</div>
+            </div>
+            <i class="fas fa-ellipsis-v" style="color:var(--text-muted);font-size:14px;margin-left:auto;"></i>
+        </div>
+    </div>
+</aside>

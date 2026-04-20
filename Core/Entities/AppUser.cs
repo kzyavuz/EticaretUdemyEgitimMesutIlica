@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Entities
 {
     public class AppUser : IdentityUser<int>
     {
+
+        [Display(Name = "Ad Soyad")]
+        [NotMapped]
+        public string FullName => $"{FirstName} {LastName}";
+
         [Display(Name = "Ad")]
         [Required(ErrorMessage = "Ad zorunludur.")]
         [StringLength(50, ErrorMessage = "Ad en fazla 50 karakter olabilir.")]
@@ -52,6 +58,9 @@ namespace Core.Entities
 
         [Display(Name = "Silinme Tarihi")]
         public DateTime? DeletedDate { get; set; }
+
+        public ICollection<Favories>? Favories { get; set; }
+        public ICollection<Adress>? Adresses { get; set; }
 
     }
 }

@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Core.Entities;
+﻿using Core.Entities;
+using Service.Extensions;
 using Data.Context;
-using WebUI.Helper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
+using WebUI.Areas.Admin.Models;
+using WebUI.Helper;
 
 namespace WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
     public class CategoriesController : AdminBaseController
     {
         private readonly DatabaseContext _context;
@@ -27,62 +31,93 @@ namespace WebUI.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var data = await _context.Categories
+                .OrderByDescending(c => c.CreatedDate)
+                .ToListAsync();
+
+            List<StartCardModel> startCards = new()
+            {
+                new StartCardModel
+                {
+                    Title = "Tüm Kategoriler",
+                    Value = data.Count,
+                    Class = "info",
+                    Tooltip = "Sitede bulunan toplam kategori sayısı",
+                    Icon = "fa-solid fa-list"
+                },
+                new StartCardModel
+                {
+                    Title = "Aktif Kategoriler",
+                    Value = data.Count(p => FunctionHelper.IsActive(p.Status)),
+                    Class = "success",
+                    Tooltip = "Sitede aktif durumda olan kategori sayısı",
+                    Icon = "fa-solid fa-check"
+                },
+                new StartCardModel
+                {
+                    Title = "Taslak Kategoriler",
+                    Value = data.Count(p => FunctionHelper.IsDraft(p.Status)),
+                    Class = "secondary",
+                    Tooltip = "Sitede taslak durumda olan kategori sayısı",
+                    Icon = "fa-solid fa-file"
+                }
+            };
+
+            List<BreadcrumbItem> breadcrumb = new()
+            {
+                new BreadcrumbItem { Title = "Kategoriler" }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumb;
+            ViewBag.StartCards = startCards;
+
+            return View(data);
         }
 
-        [HttpPost]
-        public Task<IActionResult> ImportExcel(IFormFile file)
-            => ExcelImport(file, _excelHelper.ImportCategoriesAsync,
-                (s, u) => $"{s} kategori eklendi, {u} kategori güncellendi.");
-
-        [HttpGet]
-        public IActionResult DownloadSampleExcel()
-            => DownloadSampleExcel("kategoriler_ornek.xlsx",
-                new[] {
-                    ("title", true),
-                    ("description", false),
-                    ("image", false),
-                    ("istop menu", false),
-                    ("isactive", false),
-                    ("sira_numarasi", false)
-                },
-                new object[] { "Örnek Kategori", "Kategori açıklaması", "", "evet", "evet", 1 });
-
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var model = await _context.Categories
+            var data = await _context.Categories
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (model == null)
+            if (data == null)
             {
                 return NotFound();
             }
 
-            return View(model);
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Kategoriler", Controller= "Categories", Action = "Index" },
+                new BreadcrumbItem { Title = data.Title}
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
+            return View(data);
         }
 
         public async Task<IActionResult> Form(int? id)
         {
-            if (id == null)
+
+            Category? data = new();
+
+            if (id.HasValue)
             {
-                ViewBag.Categories = await GetCategoriesAsync();
-                return View();
+                data = await _context.Categories.FindAsync(id);
+
+                if (data == null)
+                    return NotFound();
             }
 
-            var model = await _context.Categories.FindAsync(id);
-
-            if (model == null)
+            List<BreadcrumbItem> breadcrumbs = new()
             {
-                return NotFound();
-            }
+                new BreadcrumbItem { Title = "Kategoriler", Controller= "Categories", Action = "Index" },
+                new BreadcrumbItem { Title = data?.Title ?? "Yeni Kategori" }
+            };
 
+            ViewBag.Breadcrumbs = breadcrumbs;
             ViewBag.Categories = await GetCategoriesAsync();
-            return View("Form", model);
+
+            return View("Form", data);
         }
 
         [HttpPost]
@@ -94,6 +129,7 @@ namespace WebUI.Areas.Admin.Controllers
                 return View("Form", model);
             }
 
+            model.Slug = FunctionHelper.GenerateSlug(model.Title);
             _context.Add(model);
             await _context.SaveChangesAsync();
 
@@ -166,6 +202,98 @@ namespace WebUI.Areas.Admin.Controllers
             SetSweetAlertMessage("Başarılı", "Kategori başarıyla silindi.", "success");
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkDelete(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                SetSweetAlertMessage("Hata", "Silinecek kayıt seçilmedi.", "error");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var items = await _context.Categories.Where(c => ids.Contains(c.Id)).ToListAsync();
+            foreach (var item in items)
+                if (!string.IsNullOrEmpty(item.Image))
+                    _fileHelper.Delete(item.Image);
+
+            _context.Categories.RemoveRange(items);
+            await _context.SaveChangesAsync();
+
+            SetSweetAlertMessage("Başarılı", $"{items.Count} kategori silindi.", "success");
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+        [HttpPost]
+        public Task<IActionResult> ImportExcel(IFormFile file)
+            => ExcelImport(file, _excelHelper.ImportCategoriesAsync,
+                (s, u) => $"{s} kategori eklendi, {u} kategori güncellendi.");
+
+        [HttpGet]
+        public IActionResult DownloadSampleExcel()
+            => DownloadSampleExcel("kategoriler_ornek.xlsx",
+                new[] {
+                    (DisplayName<Category>(nameof(Category.Title)), true),
+                    (DisplayName<Category>(nameof(Category.Description)), false),
+                    (DisplayName<Category>(nameof(Category.Image)), false),
+                    (DisplayName<Category>(nameof(Category.ParentId)), false),
+                    (DisplayName<Category>(nameof(Category.ISTopMenu)), false),
+                    (DisplayName<Category>(nameof(Category.Status)), false),
+                    (DisplayName<Category>(nameof(Category.OrderNumber)), false)
+                },
+                new object[] { "Örnek Kategori", "Kategori açıklaması", "", "", "evet", 1, 1 });
+
+        [HttpGet]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var categories = await _context.Categories
+                .OrderByDescending(c => c.CreatedDate)
+                .ToListAsync();
+
+            using var package = new ExcelPackage();
+            var ws = package.Workbook.Worksheets.Add("Kategoriler");
+
+            ws.Cells[1, 1].Value = DisplayName<Category>(nameof(Category.Title));
+            ws.Cells[1, 2].Value = DisplayName<Category>(nameof(Category.Description));
+            ws.Cells[1, 3].Value = DisplayName<Category>(nameof(Category.Image));
+            ws.Cells[1, 4].Value = DisplayName<Category>(nameof(Category.ParentId));
+            ws.Cells[1, 5].Value = DisplayName<Category>(nameof(Category.ISTopMenu));
+            ws.Cells[1, 6].Value = DisplayName<Category>(nameof(Category.Status));
+            ws.Cells[1, 7].Value = DisplayName<Category>(nameof(Category.OrderNumber));
+
+            using (var headerRange = ws.Cells[1, 1, 1, 7])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(0x4E, 0x73, 0xDF));
+                headerRange.Style.Font.Color.SetColor(Color.White);
+            }
+
+            // Üst kategori adına hızlı erişim için dictionary
+            var catDict = categories.ToDictionary(c => c.Id, c => c.Title);
+
+            int row = 2;
+            foreach (var c in categories)
+            {
+                ws.Cells[row, 1].Value = c.Title;
+                ws.Cells[row, 2].Value = c.Description;
+                ws.Cells[row, 3].Value = c.Image;
+                ws.Cells[row, 4].Value = c.ParentId > 0 && catDict.TryGetValue(c.ParentId, out var parentTitle) ? parentTitle : "";
+                ws.Cells[row, 5].Value = c.ISTopMenu ? "evet" : "hayır";
+                ws.Cells[row, 6].Value = c.Status;
+                ws.Cells[row, 7].Value = c.OrderNumber;
+                row++;
+            }
+
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            return File(package.GetAsByteArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"kategoriler_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
         }
 
         private bool CategoryExists(int id)

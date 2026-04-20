@@ -1,0 +1,350 @@
+/* ======================================================
+   5. HERO
+====================================================== */
+.hero {
+    min-height: calc(100dvh - 70px);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.hero-noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: .025;
+    mix-blend-mode: overlay;
+}
+
+.hero-orb {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .18;
+}
+
+.hero-orb-1 {
+    width: 600px;
+    height: 600px;
+    background: var(--primary);
+    top: -200px;
+    right: -100px;
+}
+
+.hero-orb-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent);
+    bottom: -150px;
+    left: -100px;
+}
+
+.hero-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+}
+
+.hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-visual {
+    aspect-ratio: 16/8;
+}
+
+.hero-title {
+    font-size: var(--fs-hero);
+    color: var(--heading);
+    line-height: 1.08;
+    margin-bottom: 20px;
+}
+
+.hero-title em {
+    font-style: italic;
+    color: var(--primary)
+}
+
+.hero-desc {
+    font-size: var(--fs-md);
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 32px;
+}
+
+.hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px
+}
+
+/* ======================================================
+   MARQUEE / TICKER — Kayan stats şeridi
+====================================================== */
+.hero-ticker-wrap {
+    margin-top: 32px;
+    padding-top: 28px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Kenar soluk geçişleri */
+.hero-ticker-wrap::before,
+.hero-ticker-wrap::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+
+.hero-ticker {
+    display: flex;
+    gap: 0;
+    width: max-content;
+    animation: ticker-scroll 28s linear infinite;
+}
+
+.hero-ticker:hover {
+    animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.ticker-track {
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+}
+
+.ticker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 36px;
+    border-right: 1px solid var(--border2);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.ticker-item:last-child {
+    border-right: none;
+}
+
+.ticker-num {
+    font-size: var(--fs-2xl);
+    color: var(--primary);
+    line-height: 1;
+    font-weight: 700;
+}
+
+.ticker-lbl {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.3;
+}
+
+.ticker-sep {
+    font-size: 20px;
+    color: rgba(var(--primary-rgb), 0.3);
+    padding: 0 4px;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+/* ======================================================
+   Hero Swiper
+====================================================== */
+.hero-swiper-wrap {
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    border: 1px solid var(--border2);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* FIX: img etiketiyle doğru boyutlandırma */
+.hero-swiper {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.hero-swiper .swiper-wrapper {
+    height: 100%;
+}
+
+.hero-swiper-wrap .swiper-slide {
+    position: relative;
+    overflow: hidden;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.hero-swiper-wrap .swiper-slide figure {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    position: relative;
+}
+
+.hero-swiper-wrap .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* crossorigin kaldırıldı — CORS engeli yoktu, referrer politikası sorunuydu */
+    /* Tarayıcıya resmi normal yüklemesini söyle */
+}
+
+.hero-slide-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px 22px 20px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    pointer-events: none;
+}
+
+.hero-slide-caption h4 {
+    font-size: var(--fs-lg);
+    color: #fff;
+    margin: 0
+}
+
+.hero-swiper-wrap .swiper-pagination-bullet {
+    background: #fff;
+    opacity: .5
+}
+
+.hero-swiper-wrap .swiper-pagination-bullet-active {
+    opacity: 1;
+    background: var(--primary)
+}
+
+/* ======================================================
+   9. CTA BAND
+====================================================== */
+.cta-band {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 0;
+    position: relative;
+    overflow: hidden
+}
+
+.cta-band::before {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 300px;
+    border-radius: 50%;
+    background: var(--primary);
+    filter: blur(100px);
+    opacity: .07;
+    top: -80px;
+    right: -100px;
+    pointer-events: none
+}
+
+.cta-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center
+}
+
+.cta-title {
+    font-size: var(--fs-3xl);
+    margin-bottom: 14px
+}
+
+.cta-desc {
+    font-size: var(--fs-base);
+    color: var(--text-muted);
+    margin-bottom: 30px
+}
+
+.cta-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center
+}
+
+
+
+/* XL ekran: slider'ı genişlet, sağa doğru uzat */
+@media(max-width:1200px) {
+    .hero {
+        min-height: auto;
+        padding: 30px 0;
+    }
+
+    .hero-visual {
+        order: -1;
+    }
+
+    .hero-inner {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media(max-width:991px) {
+    .hero-swiper-wrap .swiper-slide {
+        height: 100% !important;
+    }
+
+    .hero-swiper-wrap .swiper-slide img {
+        height: 100%;
+    }
+}
+
+/* Tablet ve üzeri */
+@media(max-width:768px) {
+    .hero {
+        padding: 20px 0;
+    }
+
+    .hero-ticker-wrap {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    .hero-visual {
+        aspect-ratio: 4/3;
+    }
+}

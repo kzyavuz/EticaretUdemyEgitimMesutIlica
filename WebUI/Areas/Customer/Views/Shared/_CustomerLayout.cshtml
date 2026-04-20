@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="tr" data-theme="dark" data-radius="sharp" data-font="poppins">
+
+<head>
+    <partial name="~/Views/PartialViews/_Head.cshtml" />
+    <link rel="stylesheet" href="~/css/page/customer.css" />
+    <title>@ViewData["Title"] - Kozlow E-Ticaret</title>
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+    
+    @await Component.InvokeAsync("Header")
+    <div class="customer-layout">
+        
+        <partial name="~/Views/PartialViews/_CartPanel.cshtml" />
+        <partial name="~/Views/PartialViews/_ThemeSettings.cshtml" />
+
+        @if (IsLoggedIn())
+        {
+            <partial name="~/Areas/Customer/Views/PartialViews/_CustomerSidebar.cshtml" />
+        }
+        
+        <!-- Top Bar -->
+
+        <div class="@(IsLoggedIn() ? "cust-main" : "container")">
+            <main class="cust-body" role="main">
+                @RenderBody()
+            </main>
+
+        </div>
+    </div>
+
+    <partial name="~/Views/PartialViews/_Script.cshtml" />
+    <script>
+            (function() {
+                const toggle = document.getElementById('sidebarToggle');
+                const sidebar = document.getElementById('custSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+
+                function open() {
+                    sidebar.classList.add('open');
+                    overlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function close() {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+                if (toggle) toggle.addEventListener('click', open);
+                if (overlay) overlay.addEventListener('click', close);
+            })();
+    </script>
+    @RenderSection("Scripts", required: false)
+
+    <partial name="~/Views/PartialViews/_Swal2.cshtml" />
+</body>
+
+</html>

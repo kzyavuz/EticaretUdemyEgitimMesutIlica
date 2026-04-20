@@ -1,0 +1,19 @@
+﻿@model IEnumerable<BreadcrumbItem>
+
+<div>
+    <h1 class="page-title">@ViewData["Title"]</h1>
+    <div class="page-breadcrumb">
+        <a asp-controller="Dashboard" asp-action="Index">Ana Sayfa</a><span class="sep">›</span>
+        @foreach(var item in Model)
+        {
+            if (!string.IsNullOrEmpty(item.Controller))
+            {
+                <a asp-controller="@item.Controller" asp-action="@item.Action">@item.Title</a><span class="sep">›</span>
+            }
+            else
+            {
+                <span class="current">@item.Title</span>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,372 @@
+﻿<!-- NAVBAR -->
+<header id="navbar">
+    <nav aria-label="Ana Navigasyon">
+        <div class="nav-wrap custom-wrap">
+            <a asp-controller="Home" asp-action="Index" asp-area=""
+                   class="nav-logo"
+                   aria-label="Kozlow Ticaret Ana Sayfa">
+                <div class="nav-logo-mark" aria-hidden="true">KT</div>
+                <span class="nav-logo-text">Kozlow <span>Ticaret</span></span>
+            </a>
+            <ul class="nav-links mb-0">
+
+                <li>
+                    <a asp-controller="Home" asp-action="Index" asp-area="" class="active custom-a">
+                        <i class="fa fa-house fa-xs" aria-hidden="true"></i>
+                        Anasayfa
+                    </a>
+                </li>
+
+                <li class="has-mega">
+                    <span class="custom-a">
+                        <i class="fa fa-building fa-xs" aria-hidden="true"></i>
+                        Kurumsal
+                        <i class="fa fa-chevron-down chev" aria-hidden="true"></i>
+                    </span>
+
+                    <div class="nav-mega nav-mega-kurumsal" role="menu" aria-label="Kurumsal">
+                        <div class="mega-head">
+                            <div class="mega-head-title">Kurumsal</div>
+                            <div class="mega-head-desc">Kozlow Ticaret hakkında tüm bilgiler.</div>
+                        </div>
+                        <div class="mega-kurumsal-body">
+                            <div class="mega-kurumsal-pages">
+                                <a asp-area="" asp-controller="About" asp-action="Index" class="mega-item mega-item-featured" role="menuitem">
+                                    <div class="mega-item-icon"><i class="fa fa-building" aria-hidden="true"></i></div>
+                                    <div class="mega-item-body">
+                                        <div class="mega-item-title">Hakkımızda</div>
+                                        <div class="mega-item-desc">Firmamız, vizyonumuz ve değerlerimiz.</div>
+                                    </div>
+                                </a>
+                                <a asp-area="" asp-controller="Gallery" asp-action="Index" class="mega-item" role="menuitem">
+                                    <div class="mega-item-icon"><i class="fa fa-images" aria-hidden="true"></i></div>
+                                    <div class="mega-item-body">
+                                        <div class="mega-item-title">Galeri</div>
+                                        <div class="mega-item-desc">Tesis, ekipman ve üretim fotoğrafları.</div>
+                                    </div>
+                                </a>
+                                <a asp-area="" asp-controller="Catalog" asp-action="Index" class="mega-item" role="menuitem">
+                                    <div class="mega-item-icon"><i class="fa fa-book-open" aria-hidden="true"></i></div>
+                                    <div class="mega-item-body">
+                                        <div class="mega-item-title">Katalog</div>
+                                        <div class="mega-item-desc">Ürün kataloglarımızı indirin veya inceleyin.</div>
+                                    </div>
+                                </a>
+                                <a asp-area="" asp-controller="Blog" asp-action="Index" class="mega-item" role="menuitem">
+                                    <div class="mega-item-icon"><i class="fa fa-newspaper" aria-hidden="true"></i></div>
+                                    <div class="mega-item-body">
+                                        <div class="mega-item-title">Blog</div>
+                                        <div class="mega-item-desc">Sektör haberleri ve teknik içerikler.</div>
+                                    </div>
+                                </a>
+                                <a asp-area="" asp-controller="Production" asp-action="Index" class="mega-item" role="menuitem">
+                                    <div class="mega-item-icon"><i class="fa fa-industry" aria-hidden="true"></i></div>
+                                    <div class="mega-item-body">
+                                        <div class="mega-item-title">Üretim</div>
+                                        <div class="mega-item-desc">Üretim süreçlerimiz ve teknolojilerimiz.</div>
+                                    </div>
+                                </a>
+                                <a asp-area="" asp-controller="Contact" asp-action="Index" class="mega-cta-item" role="menuitem">
+                                    <div class="mega-cta-icon"><i class="fa fa-envelope" aria-hidden="true"></i></div>
+                                    <div>
+                                        <div class="mega-cta-title">İletişim</div>
+                                        <div class="mega-cta-desc">Bize ulaşın, sorularınızı yanıtlayalım.</div>
+                                    </div>
+                                </a>
+
+                                <a asp-area="" asp-controller="Offer" asp-action="Index" class="mega-cta-item" role="menuitem">
+                                    <div class="mega-cta-icon"><i class="fa fa-file-invoice" aria-hidden="true"></i></div>
+                                    <div>
+                                        <div class="mega-cta-title">Teklif Al</div>
+                                        <div class="mega-cta-desc">Ürünlerimiz için hızlı fiyat teklifi alın.</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                @await Component.InvokeAsync("Categories")
+            </ul>
+            <div class="nav-right">
+                <button class="nav-icon-btn"
+                        title="Arama"
+                        onclick="openSearch()"
+                        aria-label="Arama Yap">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+
+                <div class="d-none d-lg-flex gap-3">
+                    <a asp-controller="Cart" asp-action="Index" asp-area="Customer" class="btn-nav-cart" aria-label="Sepetim">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                        <span class=" d-none d-xl-inline-flex">Sepetim</span>
+                    </a>
+                    <a asp-controller="Favorites" asp-action="Index" asp-area="Customer" class="btn-nav-favorite" aria-label="Favorilerim">
+                        <i class="fa fa-heart" aria-hidden="true"></i>
+                        <span class=" d-none d-xl-inline-flex">Favorilerim</span>
+                    </a>
+                    @if (!IsLoggedIn())
+                    {
+                        <div class="dropdown nav-auth-dropdown">
+                            <a href="#" class="btn-nav-login dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-arrow-right-to-bracket" aria-hidden="true"></i>
+                                <span class=" d-none d-xl-inline-flex">Giriş Yap</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignIn">Giriş Yap</a></li>
+                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignUp">Kayıt Ol</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="dropdown nav-auth-dropdown">
+                            <a href="#" class="btn-nav-account dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-user" aria-hidden="true"></i>
+                                <span class=" d-none d-xl-inline-flex">Hesabım</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Index" asp-area="Customer">Hesap Bilgilerim</a></li>
+                                <li><a class="dropdown-item" asp-controller="Order" asp-action="Index" asp-area="Customer">Siparişlerim</a></li>
+                                <li>
+                                    <form method="POST" asp-controller="Auth" asp-action="SignOut" asp-area="">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item">Çıkış Yap</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+
+                <button class="hamburger"
+                        id="hamburger"
+                        onclick="toggleMobileMenu()"
+                        aria-label="Menüyü Aç/Kapat"
+                        aria-expanded="false">
+                    <span class="ham-bar"></span><span class="ham-bar"></span><span class="ham-bar"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Mob scrim -->
+<div class="mob-scrim" id="mobScrim" onclick="closeMob()"></div>
+
+<!-- Mobile Drawer -->
+<nav class="mobile-drawer" id="mobileDrawer" aria-label="Mobil Menü">
+    <div class="mob-drawer-head">
+        <a asp-controller="Home" asp-action="Index"
+               class="nav-logo text-none"
+               onclick="closeMob()"
+               aria-label="Ana Sayfa">
+            <div class="nav-logo-mark w-32px h-32px fs-13px"
+                 aria-hidden="true">
+                KT
+            </div>
+            <span class="nav-logo-text fs-14px">Kozlow <span>Ticaret</span></span>
+        </a>
+        <button class="mob-drawer-close"
+                onclick="closeMob()"
+                aria-label="Menüyü Kapat">
+            <i class="fa fa-xmark" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="mob-drawer-body">
+        <div class="mob-link active"
+             onclick="closeMob()">
+            <span><i class="fa fa-house m-ico" aria-hidden="true"></i> Anasayfa</span>
+        </div>
+        <div class="mob-link"
+             id="mSub1Btn"
+             onclick="toggleMobSub('mSub1', 'mSub1Btn')"
+             aria-expanded="false">
+            <span>
+                <i class="fa fa-building m-ico" aria-hidden="true"></i>
+                Kurumsal
+            </span><i class="fa fa-chevron-down m-chev" aria-hidden="true"></i>
+        </div>
+        <div class="mob-sub" id="mSub1" role="menu">
+            <a asp-controller="About" asp-action="Index"
+               onclick="closeMob()"
+               role="menuitem"><i class="fa fa-info-circle" aria-hidden="true"></i> Hakkımızda</a>
+            <a asp-controller="Gallery" asp-action="Index"
+               onclick="closeMob()"
+               role="menuitem"><i class="fa fa-images" aria-hidden="true"></i> Galeri</a>
+            <a asp-controller="Catalog" asp-action="Index"
+               onclick="closeMob()"
+               role="menuitem"><i class="fa fa-book-open" aria-hidden="true"></i> Katalog</a>
+            <a asp-controller="Blog" asp-action="Index" onclick="closeMob()" role="menuitem"><i class="fa fa-newspaper" aria-hidden="true"></i> Blog</a>
+            <a asp-controller="Production" asp-action="Index" onclick="closeMob()" role="menuitem"><i class="fa fa-industry" aria-hidden="true"></i> Üretim</a>
+            <a asp-controller="Contact" asp-action="Index" onclick="closeMob()" role="menuitem"><i class="fa fa-envelope" aria-hidden="true"></i> İletişim</a>
+            <a asp-controller="Offer" asp-action="Index" onclick="closeMob()" role="menuitem"><i class="fa fa-file-invoice" aria-hidden="true"></i> Teklif Al</a>
+        </div>
+        <div class="mob-link"
+             id="mSub2Btn"
+             onclick="toggleMobSub('mSub2', 'mSub2Btn')"
+             aria-expanded="false">
+            <span>
+                <i class="fa fa-boxes-stacked m-ico" aria-hidden="true"></i>
+                Ürünler
+            </span><i class="fa fa-chevron-down m-chev" aria-hidden="true"></i>
+        </div>
+        <div class="mob-sub" id="mSub2" role="menu">
+            <a asp-controller="Product" asp-action="Index"
+               onclick="closeMob()"
+               role="menuitem"><i class="fa fa-th-large" aria-hidden="true"></i> Tüm Ürünler</a>
+            <a asp-controller="Product" asp-action="AluminumProfiles" onclick="closeMob()" role="menuitem">
+                <i class="fa fa-layer-group" aria-hidden="true"></i> Alüminyum
+                Fitilleri
+            </a>
+            <a asp-controller="Product" asp-action="SteelDoorProfiles" onclick="closeMob()" role="menuitem">
+                <i class="fa fa-door-closed" aria-hidden="true"></i> Çelik Kapı
+                Fitilleri
+            </a>
+            <a asp-controller="Product" asp-action="Injection" onclick="closeMob()" role="menuitem"><i class="fa fa-cogs" aria-hidden="true"></i> Enjeksiyon</a>
+            <a asp-controller="Product" asp-action="Hose" onclick="closeMob()" role="menuitem"><i class="fa fa-tint" aria-hidden="true"></i> Hortum</a>
+
+        </div>
+
+        <!-- Auth section -->
+    </div>
+    <div class="mob-drawer-footer">
+        <div class="mob-auth-section">
+            <a asp-controller="Auth" asp-action="SignIn" class="mob-auth-login" onclick="closeMob()">
+                <i class="fa fa-arrow-right-to-bracket" aria-hidden="true"></i> Giriş Yap
+            </a>
+            <a asp-controller="Auth" asp-action="SignUp" class="mob-auth-register" onclick="closeMob()">
+                <i class="fa fa-user-plus" aria-hidden="true"></i> Kayıt Ol
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- DEMO NAV -->
+<!-- <nav class="demo-nav d-none d-xl-inline-flex" aria-label="Demo Sayfalar">
+    <a href="about.php" class="dn-btn">Hakkımızda</a>
+    <a href="gallery.php" class="dn-btn">Galeri</a>
+    <a href="catalog.php" class="dn-btn">Katalog</a>
+    <a href="blog.php" class="dn-btn">Blog</a>
+    <a href="production.php" class="dn-btn">Üretim</a>
+    <a href="product.php" class="dn-btn">Ürünler</a>
+    <a href="contact.php" class="dn-btn">İletişim</a>
+</nav> -->
+@section Scripts {
+    <script>
+        /* ── Auth pill slider ── */
+        (function() {
+            var group = document.getElementById('authNavGroup');
+            var pill = document.getElementById('authPill');
+            if (!group || !pill) return;
+            var btns = group.querySelectorAll('.btn-nav-login, .btn-nav-register');
+
+            function movePill(btn) {
+                pill.style.left = btn.offsetLeft + 'px';
+                pill.style.width = btn.offsetWidth + 'px';
+                btns.forEach(function(b) {
+                    b.classList.remove('auth-active');
+                });
+                btn.classList.add('auth-active');
+            }
+
+            /* Init pill hidden in center — no transition so it appears instantly on first hover */
+            pill.style.transition = 'none';
+            pill.style.opacity = '0';
+            var midBtn = btns[Math.floor(btns.length / 2)];
+            pill.style.left = midBtn.offsetLeft + 'px';
+            pill.style.width = midBtn.offsetWidth + 'px';
+
+            group.addEventListener('mouseenter', function() {
+                /* On first enter: snap pill to hovered btn without animation, then fade + enable transition */
+                var hovered = group.querySelector(':hover.btn-nav-login, :hover.btn-nav-register');
+                if (!hovered) hovered = btns[0];
+                pill.style.left = hovered.offsetLeft + 'px';
+                pill.style.width = hovered.offsetWidth + 'px';
+                pill.style.opacity = '1';
+                requestAnimationFrame(function() {
+                    requestAnimationFrame(function() {
+                        pill.style.transition = '';
+                    });
+                });
+            });
+
+            group.addEventListener('mouseleave', function() {
+                /* Hide pill and reset transition state for next entry */
+                pill.style.transition = 'none';
+                pill.style.opacity = '0';
+            });
+
+            btns.forEach(function(btn) {
+                btn.addEventListener('mouseenter', function() {
+                    movePill(this);
+                });
+            });
+        }());
+
+        /* ── Mega menu – smooth Swiper-feel transition ── */
+        (function() {
+            var items = Array.prototype.slice.call(document.querySelectorAll('li.has-mega'));
+            var activeItem = null;
+            var closeTimer = null;
+
+            function idxOf(item) {
+                return items.indexOf(item);
+            }
+
+            function show(item) {
+                clearTimeout(closeTimer);
+                var mega = item.querySelector('.nav-mega');
+                if (!mega) return;
+
+                if (activeItem && activeItem !== item) {
+                    /* Switching: instantly hide previous, slide-in new */
+                    var prevMega = activeItem.querySelector('.nav-mega');
+                    if (prevMega) {
+                        prevMega.classList.remove('is-active', 'from-left', 'from-right');
+                    }
+                    var dir = idxOf(item) > idxOf(activeItem) ? 'from-right' : 'from-left';
+                    mega.classList.remove('from-left', 'from-right');
+                    void mega.offsetWidth; /* reflow – restart animation */
+                    mega.classList.add('is-active', dir);
+                } else {
+                    /* First open: fade + slide-up (default CSS transition) */
+                    mega.classList.remove('from-left', 'from-right');
+                    mega.classList.add('is-active');
+                }
+                activeItem = item;
+            }
+
+            function scheduleClose(item) {
+                clearTimeout(closeTimer);
+                closeTimer = setTimeout(function() {
+                    if (activeItem !== item) return;
+                    var mega = item.querySelector('.nav-mega');
+                    if (mega) mega.classList.remove('is-active', 'from-left', 'from-right');
+                    activeItem = null;
+                }, 200);
+            }
+
+            items.forEach(function(item) {
+                item.addEventListener('mouseenter', function() {
+                    show(this);
+                });
+                item.addEventListener('mouseleave', function() {
+                    scheduleClose(this);
+                });
+
+                /* Keep panel alive when mouse is inside the mega area */
+                var mega = item.querySelector('.nav-mega');
+                if (mega) {
+                    mega.addEventListener('mouseenter', function() {
+                        clearTimeout(closeTimer);
+                    });
+                    mega.addEventListener('mouseleave', function() {
+                        var parent = this.closest('li.has-mega');
+                        if (parent) scheduleClose(parent);
+                    });
+                }
+            });
+        }());
+    </script>
+}

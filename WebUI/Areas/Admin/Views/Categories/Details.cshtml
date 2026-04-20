@@ -5,107 +5,91 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div class="d-flex align-items-center gap-2">
-            <div class="bg-primary bg-opacity-10 rounded p-2">
-                <i class="fas fa-eye text-primary"></i>
-            </div>
-            <div>
-                <h4 class="mb-0 fw-semibold">Kategori Detayları</h4>
-                <small class="text-muted">@Model.Title</small>
+
+@* breadcrumb ve butonlar *@
+<div class="page-header">
+    <partial name="~/Areas/Admin/Views/PartialViews/_Breadcrumb.cshtml" model="@ViewBag.Breadcrumbs" />
+
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Geri Dön
+    </a>
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <p class="text-uppercase text-muted fw-semibold small mb-3">Temel Bilgiler</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Başlık</span>
+                        <strong>@Model.Title</strong>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                        <span class="text-muted small">Açıklama</span>
+                        <span class="text-end" style="max-width:60%">@(Model.Description ?? "-")</span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Üst Menü</span>
+                        <span class="badge rounded-pill @(Model.ISTopMenu ? "bg-primary" : "bg-secondary")">
+                            @(Model.ISTopMenu ? "Evet" : "Hayır")
+                        </span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Sıra No</span>
+                        <span>@(Model.OrderNumber?.ToString() ?? "-")</span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Durum</span>
+                        @Html.Raw(StatusBadge(Model.Status))
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Oluşturulma</span>
+                        <span>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
+                    </li>
+                    @if (Model.UpdatedDate.HasValue)
+                    {
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">Güncellenme</span>
+                            <span>@Model.UpdatedDate.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                        </li>
+                    }
+                </ul>
             </div>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left me-1"></i>Geri Dön
-        </a>
     </div>
 
-    <div class="row g-4">
+    <div class="col-lg-4 d-flex flex-column gap-3">
 
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <p class="text-uppercase text-muted fw-semibold small mb-3">Temel Bilgiler</p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">Başlık</span>
-                            <strong>@Model.Title</strong>
-                        </li>
-                        <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
-                            <span class="text-muted small">Açıklama</span>
-                            <span class="text-end" style="max-width:60%">@(Model.Description ?? "-")</span>
-                        </li>
-                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">Üst Menü</span>
-                            <span class="badge rounded-pill @(Model.ISTopMenu ? "bg-primary" : "bg-secondary")">
-                                @(Model.ISTopMenu ? "Evet" : "Hayır")
-                            </span>
-                        </li>
-                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">Sıra No</span>
-                            <span>@(Model.OrderNumber?.ToString() ?? "-")</span>
-                        </li>
-                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">Durum</span>
-                            <span class="badge rounded-pill @(Model.IsActive ? "bg-success" : "bg-danger")">
-                                @(Model.IsActive ? "Aktif" : "Pasif")
-                            </span>
-                        </li>
-                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">Oluşturulma</span>
-                            <span>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
-                        </li>
-                        @if (Model.UpdatedDate.HasValue)
-                        {
-                            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                <span class="text-muted small">Güncellenme</span>
-                                <span>@Model.UpdatedDate.Value.ToString("dd.MM.yyyy HH:mm")</span>
-                            </li>
-                        }
-                    </ul>
-                </div>
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 text-center">
+                <p class="text-uppercase text-muted fw-semibold small mb-3">Resim</p>
+                @{
+                    string? imageSrc = ResolveImageSrc(Model.Image);
+                }
+                <a href="@imageSrc" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Tam boyutta görüntüle">
+                    <img src="@imageSrc" alt="Resim" class="img-fluid rounded-3"
+                         style="max-height:180px;object-fit:contain;" loading="lazy" />
+                </a>
             </div>
         </div>
 
-        <div class="col-lg-4 d-flex flex-column gap-3">
-
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 text-center">
-                    <p class="text-uppercase text-muted fw-semibold small mb-3">Resim</p>
-                    @{
-                        string? imageSrc = ResolveImageSrc(Model.Image);
-                    }
-                    @if (imageSrc != null)
-                    {
-                        <a href="@imageSrc" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
-                               title="Tam boyutta görüntüle">
-                            <img src="@imageSrc" alt="Resim"
-                                 class="img-fluid rounded-3" style="max-height:180px;object-fit:contain;" loading="lazy" />
-                        </a>
-                    }
-                    else
-                    {
-                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height:120px">
-                            <i class="fas fa-image fa-2x text-muted"></i>
-                        </div>
-                    }
-                </div>
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 d-grid gap-2">
+                <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+                    <i class="fas fa-pen-to-square me-2"></i>Düzenle
+                </a>
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="confirmDelete(null, '@Html.Raw(Model.Title?.Replace("'", "\\'"))', 'Kategoriyi Sil')">
+                    <i class="fas fa-trash me-2"></i>Sil
+                </button>
             </div>
-
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 d-grid gap-2">
-                    <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-warning">
-                        <i class="fas fa-pen-to-square me-2"></i>Düzenle
-                    </a>
-                    <button type="button" class="btn btn-danger"
-                            onclick="confirmDelete(null, '@Html.Raw(Model.Title?.Replace("'", "\\'"))', 'Kategoriyi Sil')">
-                        <i class="fas fa-trash me-2"></i>Sil
-                    </button>
-                </div>
-            </div>
-
         </div>
+
     </div>
+</div>
 
 <form id="deleteForm" asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:none;">
     @Html.AntiForgeryToken()

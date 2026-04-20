@@ -1,0 +1,260 @@
+/* ======================================================
+   17. FILTER DRAWER (Ürün filtre drawable menüsü)
+====================================================== */
+.filter-drawer {
+    position: fixed;
+    top: 0;
+    left: -340px;
+    bottom: 0;
+    width: 310px;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border2);
+    z-index: 2100;
+    overflow-y: auto;
+    transition: left .38s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 12px 0 48px rgba(0, 0, 0, 0.45)
+}
+
+.filter-drawer.open {
+    left: 0
+}
+
+.filter-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s, visibility .3s
+}
+
+.filter-scrim.open {
+    opacity: 1;
+    visibility: visible
+}
+
+.fd-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--card-bg);
+    z-index: 1
+}
+
+.fd-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--heading)
+}
+
+.fd-close {
+    width: 32px;
+    height: 32px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .2s
+}
+
+.fd-close:hover {
+    color: var(--primary);
+    border-color: var(--primary)
+}
+
+.fd-body {
+    padding: 18px 20px
+}
+
+.fd-section {
+    margin-bottom: 24px
+}
+
+.fd-sec-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--border)
+}
+
+.fd-content {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.fd-row {
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background .15s
+}
+
+.fd-row:hover {
+    background: rgba(var(--primary-rgb), 0.06)
+}
+
+.fd-row label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 9px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    flex: 1
+}
+
+.fd-row label .label_area {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fd-row input {
+    accent-color: var(--primary);
+    cursor: pointer
+}
+
+.fd-cnt {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg3);
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.fd-mat {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px
+}
+
+.fd-mat-btn {
+    padding: 5px 12px;
+    border: 1.5px solid var(--border2);
+    border-radius: var(--r-full);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: all .22s
+}
+
+.fd-mat-btn:hover,
+.fd-mat-btn.on {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.08)
+}
+
+.fd-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 9px;
+    position: sticky;
+    bottom: 0;
+    background: var(--card-bg)
+}
+
+.fd-btn-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: var(--bg3);
+    border: 1.5px solid var(--border2);
+    border-radius: var(--r-full);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .25s
+}
+
+.fd-btn-open:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.07)
+}
+
+.filter-area {
+    border-radius: var(--r-full);
+    background: var(--bg2);
+    padding: 6px 10px;
+}
+
+/* ======================================================
+   SIDEBAR MODU (data-filter-mode="sidebar")
+====================================================== */
+@media (min-width: 992px) {
+    html[data-filter-mode="sidebar"] .filter-drawer {
+        position: sticky;
+        top: 90px;
+        /* Header boşluğu artı pay */
+        left: 0;
+        bottom: auto;
+        width: 280px;
+        min-width: 280px;
+        height: calc(100vh - 110px);
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        z-index: 10;
+        box-shadow: none;
+        transition: none;
+    }
+
+    html[data-filter-mode="sidebar"] .filter-scrim {
+        display: none !important;
+    }
+
+    /* Fixed olan elemanların Sidebar içindeki davranışı */
+    html[data-filter-mode="sidebar"] .fd-head {
+        border-radius: var(--r-md);
+        border-bottom: 0;
+    }
+
+    /* Masaüstünde Sidebar modunda footer ve kapatma butonunu gizle */
+    html[data-filter-mode="sidebar"] .fd-footer,
+    html[data-filter-mode="sidebar"] .fd-close {
+        display: none;
+    }
+
+    /* Ürün gridinin üstündeki Filtrele butonunu gizle */
+    html[data-filter-mode="sidebar"] .fd-btn-open {
+        display: none;
+    }
+
+    /* Product Wrapper için layout ayarı */
+    html[data-filter-mode="sidebar"] .product-layout {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+    }
+
+    html[data-filter-mode="sidebar"] .product-content {
+        flex: 1;
+        min-width: 0;
+    }
+}

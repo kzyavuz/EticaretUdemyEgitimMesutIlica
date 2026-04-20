@@ -1,0 +1,263 @@
+﻿@model ProductDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Product?.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string? imageSrc = ResolveImageSrc(Model.Product?.Image);
+
+    bool inStock = Model.Product?.StockCount > 0;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/page/product_details.min.css" />
+}
+
+@Html.AntiForgeryToken()
+
+<nav class="breadcrumb-bar" aria-label="Sayfa Yolu">
+    <div class="container">
+        <div class="bc-inner">
+            <a asp-controller="Home" asp-action="Index" aria-label="Ana Sayfa">
+                <i class="fa fa-house" aria-hidden="true"></i>
+                <span>Anasayfa</span>
+            </a>
+            <i class="fa fa-chevron-right bc-sep" aria-hidden="true"></i>
+            <a asp-controller="Products" asp-action="Index">
+                <span>Ürünler</span>
+            </a>
+            @if (Model.Product?.Category != null)
+            {
+                <i class="fa fa-chevron-right bc-sep" aria-hidden="true"></i>
+                <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@Model.Product.Category.Id">
+                    <span>@Model.Product.Category.Title</span>
+                </a>
+            }
+            <i class="fa fa-chevron-right bc-sep" aria-hidden="true"></i>
+            <span class="active" aria-current="page">@Model.Product?.Title</span>
+        </div>
+    </div>
+</nav>
+
+<section class="sec bg-bg visible" aria-labelledby="detail-title">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="product-image-area">
+                    <div class="adv-main-wrap" onclick="openLightbox(0)" role="button" tabindex="0"
+                         aria-label="Görseli büyüt">
+                        <img class="adv-main-img" id="mainImg" src="@imageSrc" alt="@Model.Product?.Title ana görsel"
+                             loading="eager" decoding="async" />
+                        <div class="adv-main-actions">
+                            <button class="adv-action-btn" onclick="event.stopPropagation(); openLightbox(0);"
+                                    aria-label="Görseli büyüt">
+                                <i class="fa fa-magnifying-glass-plus" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="adv-badges" aria-label="Ürün etiketleri">
+                            @if (inStock)
+                            {
+                                <span class="adv-badge accent">Stokta</span>
+                            }
+                            else
+                            {
+                                <span class="adv-badge" style="background:rgba(220,38,38,.85)">Stok Yok</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="adv-thumbs" role="list" aria-label="Ürün görselleri">
+                        <img class="adv-thumb on" src="@imageSrc" onclick="swapImg(this, '@imageSrc', 0)"
+                             alt="@Model.Product?.Title görsel" loading="lazy" role="listitem" tabindex="0" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                @if (!string.IsNullOrEmpty(Model.Product?.ProductCode))
+                {
+                    <div class="detail-sku">SKU: @Model.Product.ProductCode</div>
+                }
+                @if (Model.Product?.Brand != null)
+                {
+                    <div class="detail-sku" style="margin-top:4px">
+                        <i class="fa fa-tag fa-xs" aria-hidden="true"></i> @Model.Product.Brand.Name
+                    </div>
+                }
+                <h1 class="detail-title" id="detail-title">@Model.Product?.Title</h1>
+                @if (!string.IsNullOrWhiteSpace(Model.Product?.Description))
+                {
+                    <p class="detail-desc">@Model.Product.Description</p>
+                }
+                <ul class="det-features list-none p-0" aria-label="Ürün özellikleri">
+                    <li class="det-feat">
+                        <i class="fa fa-shield-halved" aria-hidden="true"></i> ISO 9001:2015 Sertifikalı
+                    </li>
+                    <li class="det-feat">
+                        <i class="fa fa-truck-fast" aria-hidden="true"></i> Hızlı Teslimat
+                    </li>
+                    <li class="det-feat">
+                        <i class="fa fa-ruler-combined" aria-hidden="true"></i> Özel Kesim Mevcut
+                    </li>
+                    <li class="det-feat">
+                        <i class="fa fa-boxes-packing" aria-hidden="true"></i> Toplu Sipariş İndirimi
+                    </li>
+                </ul>
+                <div class="order-box">
+                    <div class="order-lbl">Sipariş Miktarı</div>
+
+                    <div class="qty-wrap" role="group" aria-label="Miktar Seçimi">
+
+                        <button class="qty-btn" onclick="chQty(-1)" aria-label="Miktarı azalt">−</button>
+                        <input class="qty-inp" id="qtyInp" type="number" value="1" min="1" aria-label="Miktar" />
+                        <button class="qty-btn" onclick="chQty(1)" aria-label="Miktarı artır">+</button>
+                    </div>
+
+                    <p class="fs-11px text-muted mb-18">
+                        <i class="fa fa-info-circle text-primary" aria-hidden="true"></i>
+                        Minimum sipariş: 1 adet
+                        @if (inStock)
+                        {
+                            <span class="ms-2 text-success fw-bold">
+                                <i class="fa fa-circle-check" aria-hidden="true"></i> Stokta (@Model.Product?.StockCount
+                                adet)
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="ms-2 text-danger fw-bold">
+                                <i class="fa fa-circle-xmark" aria-hidden="true"></i> Stok Yok
+                            </span>
+                        }
+                    </p>
+                    <div class="d-flex gap-10 flex-wrap">
+
+                        <button type="button"
+                                onclick="editToCart(this, @Model.Product.Id)"
+                                class="btn-p"
+                                aria-label="Sepete Ekle"
+                                data-process-type="add"
+                                data-add-url="@Url.Action("AddToCart", "Cart", new { area = "Customer" })">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            Sepete Ekle
+                        </button>
+
+                        <a href="tel:+905531048108" class="btn-o">
+                            <i class="fa fa-phone" aria-hidden="true"></i> Ara
+                        </a>
+                    </div>
+                </div>
+                <address class="quick-contact font-normal">
+                    <div class="qc-icon">
+                        <i class="fa fa-headset" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="fs-11px fw-800 text-muted ls-1 uppercase mb-2">Hızlı Destek</div>
+                        <div class="fs-sm text-heading">
+                            <a href="tel:+905531048108">+90 553 104 81 08</a> ·
+                            <a href="mailto:info@kozlowticaret.com">info@kozlowticaret.com</a>
+                        </div>
+                    </div>
+                </address>
+            </div>
+        </div>
+        <div class="mt-56">
+            <div class="det-tabs" role="tablist">
+                <button class="det-tab on" role="tab" aria-selected="true" aria-controls="dt-desc"
+                        onclick="detTab(this, 'dt-desc')">
+                    Ürün Açıklaması
+                </button>
+                <button class="det-tab" role="tab" aria-selected="false" aria-controls="dt-specs"
+                        onclick="detTab(this, 'dt-specs')">
+                    Teknik Özellikler
+                </button>
+            </div>
+            <div id="dt-desc" role="tabpanel" class="pt-28">
+                @if (!string.IsNullOrWhiteSpace(Model.Product?.Description))
+                {
+                    <p class="text-muted lh-1-85 max-w-720px">@Model.Product.Description</p>
+                }
+                else
+                {
+                    <p class="text-muted fs-sm">Bu ürün için açıklama bulunmamaktadır.</p>
+                }
+            </div>
+            <div id="dt-specs" role="tabpanel" class="pt-28 d-none">
+                <table class="table table-bordered table-sm" style="max-width:480px">
+                    <tbody>
+                        @if (!string.IsNullOrEmpty(Model.Product?.ProductCode))
+                        {
+                            <tr>
+                                <th>Ürün Kodu</th>
+                                <td>@Model.Product.ProductCode</td>
+                            </tr>
+                        }
+                        @if (Model.Product?.Brand != null)
+                        {
+                            <tr>
+                                <th>Marka</th>
+                                <td>@Model.Product.Brand.Name</td>
+                            </tr>
+                        }
+                        @if (Model.Product?.Category != null)
+                        {
+                            <tr>
+                                <th>Kategori</th>
+                                <td>@Model.Product.Category.Title</td>
+                            </tr>
+                        }
+                        <tr>
+                            <th>Stok Durumu</th>
+                            <td>@(inStock ? $"Stokta ({Model.Product?.StockCount} adet)" : "Stok Yok")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="sec bg-bg visible" aria-labelledby="related-title">
+    <div class="container">
+        <h2 class="sec-title" id="related-title">İlgili Ürünler</h2>
+        <div class="swiper cards-swiper products-home-swiper" aria-label="Ürünler">
+            <div class="swiper-wrapper">
+                @if (Model?.RelatedProducts == null || !Model.RelatedProducts.Any())
+                {
+                    <p class="text-center text-muted">Gösterilecek ilgili ürün bulunamadı.</p>
+                }
+                else
+                {
+                    @foreach (Product item in Model.RelatedProducts)
+                    {
+                        <div class="swiper-slide">
+                            @await Component.InvokeAsync("ProductCard", new { product = item })
+                        </div>
+                    }
+                }
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Lightbox -->
+<div class="img-lightbox" id="imgLightbox" onclick="lbClose(event)" role="dialog" aria-modal="true"
+     aria-label="Ürün Görseli Büyütme">
+    <button class="lb-close" onclick="closeLightbox()" aria-label="Kapat">
+        <i class="fa fa-xmark" aria-hidden="true"></i>
+    </button>
+    <button class="lb-arrow lb-prev" onclick="lbNav(-1); event.stopPropagation();" aria-label="Önceki Görsel">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+    </button>
+    <img class="lb-img" id="lbImg" src="" alt="Ürün görseli büyütülmüş" />
+    <button class="lb-arrow lb-next" onclick="lbNav(1); event.stopPropagation();" aria-label="Sonraki Görsel">
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </button>
+    <span class="lb-counter" id="lbCounter" aria-live="polite">1 / 1</span>
+</div>
+
+@section Scripts {
+    <script>
+        var lbImages = ["@imageSrc"];
+    </script>
+}
+

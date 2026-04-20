@@ -1,7 +1,10 @@
-using OfficeOpenXml;
-using Core.Entities;
+﻿using Core.Entities;
+using Core.Enum;
 using Data.Context;
 using Microsoft.AspNetCore.SignalR;
+using OfficeOpenXml;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using WebUI.Hubs;
 
 namespace WebUI.Helper
@@ -54,38 +57,42 @@ namespace WebUI.Helper
                         var headers = new Dictionary<string, int>();
                         for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                         {
-                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower().Trim();
+                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower(System.Globalization.CultureInfo.GetCultureInfo("tr-TR")).Trim();
                             if (!string.IsNullOrEmpty(headerValue))
                             {
                                 headers[headerValue] = col;
                             }
                         }
 
-                        // Gerekli sütunları kontrol et
-                        var nameColumn = headers.Keys.FirstOrDefault(k =>k == "marka_adi");
+                        // Sütun başlıklarını entity Display adlarından türet
+                        var trCulture    = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+                        var kName        = GetDisplayName<Brand>(nameof(Brand.Name)).ToLower(trCulture);
+                        var kDescription = GetDisplayName<Brand>(nameof(Brand.Description)).ToLower(trCulture);
+                        var kLogo        = GetDisplayName<Brand>(nameof(Brand.Logo)).ToLower(trCulture);
+                        var kIsActive    = GetDisplayName<Brand>(nameof(Brand.Status)).ToLower(trCulture);
+                        var kOrderNumber = GetDisplayName<Brand>(nameof(Brand.OrderNumber)).ToLower(trCulture);
 
-                        if (nameColumn == null)
+                        // Gerekli sütunları kontrol et — başlıklar örnek Excel ile birebir eşleşmeli
+                        if (!headers.ContainsKey(kName))
                         {
-                            errors.Add("Excel dosyasında marka adı sütunu bulunamadı. Beklenen: 'marka_adi', 'Name', 'Adı'");
+                            errors.Add($"Excel dosyasında zorunlu '{GetDisplayName<Brand>(nameof(Brand.Name))}' sütunu bulunamadı.");
                             return (0, 0, errors);
                         }
 
                         var processedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                        var descCol = headers.Keys.FirstOrDefault(k => k == "aciklama");
-
-                        var logoCol = headers.Keys.FirstOrDefault(k => k == "logo");
-
-                        var activeCol = headers.Keys.FirstOrDefault(k => k == "durum");
-
-                        var orderNumberCol = headers.Keys.FirstOrDefault(k => k == "sira_numarasi");
+                        // headers küçük harfe çevrildiği için karşılaştırmalar lowercase
+                        var descCol    = headers.ContainsKey(kDescription) ? kDescription : null;
+                        var logoCol    = headers.ContainsKey(kLogo) ? kLogo : null;
+                        var activeCol  = headers.ContainsKey(kIsActive) ? kIsActive : null;
+                        var orderNumberCol = headers.ContainsKey(kOrderNumber) ? kOrderNumber : null;
 
                         // Verileri oku (Row 2 başlayarak)
                         for (int row = 2; row <= rowCount; row++)
                         {
                             try
                             {
-                                var name = worksheet.Cells[row, headers[nameColumn]].Value?.ToString()?.Trim();
+                                var name = worksheet.Cells[row, headers[kName]].Value?.ToString()?.Trim();
 
                                 if (string.IsNullOrEmpty(name))
                                 {
@@ -134,7 +141,7 @@ namespace WebUI.Helper
                                     existingBrand.Description = description;
                                     if (!string.IsNullOrEmpty(logo))
                                         existingBrand.Logo = logo;
-                                    existingBrand.IsActive = isActive;
+                                    existingBrand.Status = isActive ? DataStatus.Active : DataStatus.Draft;
                                     if (orderNumber.HasValue)
                                         existingBrand.OrderNumber = orderNumber;
                                     existingBrand.UpdatedDate = DateTime.Now;
@@ -148,7 +155,7 @@ namespace WebUI.Helper
                                         Name = name,
                                         Description = description,
                                         Logo = logo,
-                                        IsActive = isActive,
+                                        Status = isActive ? DataStatus.Active : DataStatus.Draft,
                                         OrderNumber = orderNumber
                                     });
                                     successCount++;
@@ -243,26 +250,38 @@ namespace WebUI.Helper
                         var headers = new Dictionary<string, int>();
                         for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                         {
-                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower().Trim();
+                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower(System.Globalization.CultureInfo.GetCultureInfo("tr-TR")).Trim();
                             if (!string.IsNullOrEmpty(headerValue))
                             {
                                 headers[headerValue] = col;
                             }
                         }
 
-                        // Gerekli sütunları kontrol et
-                        if (!headers.ContainsKey("title"))
+                        // Sütun başlıklarını entity Display adlarından türet
+                        var trCulture    = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+                        var kTitle       = GetDisplayName<Category>(nameof(Category.Title)).ToLower(trCulture);
+                        var kDescription = GetDisplayName<Category>(nameof(Category.Description)).ToLower(trCulture);
+                        var kImage       = GetDisplayName<Category>(nameof(Category.Image)).ToLower(trCulture);
+                        var kParentId    = GetDisplayName<Category>(nameof(Category.ParentId)).ToLower(trCulture);
+                        var kIsTopMenu   = GetDisplayName<Category>(nameof(Category.ISTopMenu)).ToLower(trCulture);
+                        var kIsActive    = GetDisplayName<Category>(nameof(Category.Status)).ToLower(trCulture);
+                        var kOrderNumber = GetDisplayName<Category>(nameof(Category.OrderNumber)).ToLower(trCulture);
+
+                        // Gerekli sütunları kontrol et — başlıklar örnek Excel ile birebir eşleşmeli
+                        if (!headers.ContainsKey(kTitle))
                         {
-                            errors.Add("Excel dosyasında 'Title' sütunu bulunamadı.");
+                            errors.Add($"Excel dosyasında zorunlu '{GetDisplayName<Category>(nameof(Category.Title))}' sütunu bulunamadı.");
                             return (0, 0, errors);
                         }
+
+                        var allCategories = _context.Categories.ToList();
 
                         // Verileri oku (Row 2 başlayarak)
                         for (int row = 2; row <= rowCount; row++)
                         {
                             try
                             {
-                                var title = worksheet.Cells[row, headers["title"]].Value?.ToString()?.Trim();
+                                var title = worksheet.Cells[row, headers[kTitle]].Value?.ToString()?.Trim();
 
                                 if (string.IsNullOrEmpty(title))
                                 {
@@ -270,23 +289,39 @@ namespace WebUI.Helper
                                     continue;
                                 }
 
-                                var description = headers.ContainsKey("description")
-                                    ? worksheet.Cells[row, headers["description"]].Value?.ToString()?.Trim()
+                                var description = headers.ContainsKey(kDescription)
+                                    ? worksheet.Cells[row, headers[kDescription]].Value?.ToString()?.Trim()
                                     : null;
-                                var image = headers.ContainsKey("image")
-                                    ? worksheet.Cells[row, headers["image"]].Value?.ToString()?.Trim()
+                                var image = headers.ContainsKey(kImage)
+                                    ? worksheet.Cells[row, headers[kImage]].Value?.ToString()?.Trim()
                                     : null;
-                                var isTopMenu = headers.ContainsKey("istop menu")
-                                    ? ParseBool(worksheet.Cells[row, headers["istop menu"]].Value?.ToString() ?? "false")
+
+                                int parentId = 0;
+                                if (headers.ContainsKey(kParentId))
+                                {
+                                    var parentName = worksheet.Cells[row, headers[kParentId]].Value?.ToString()?.Trim();
+                                    if (!string.IsNullOrEmpty(parentName))
+                                    {
+                                        var parentCat = allCategories.FirstOrDefault(c => c.Title.Equals(parentName, StringComparison.OrdinalIgnoreCase))
+                                                        ?? categoriesToAdd.FirstOrDefault(c => c.Title.Equals(parentName, StringComparison.OrdinalIgnoreCase));
+                                        if (parentCat != null)
+                                            parentId = parentCat.Id;
+                                        else
+                                            errors.Add($"Satır {row}: '{parentName}' üst kategorisi bulunamadı, üst kategori atanmadı.");
+                                    }
+                                }
+
+                                var isTopMenu = headers.ContainsKey(kIsTopMenu)
+                                    ? ParseBool(worksheet.Cells[row, headers[kIsTopMenu]].Value?.ToString() ?? "false")
                                     : false;
-                                var isActive = headers.ContainsKey("isactive")
-                                    ? ParseBool(worksheet.Cells[row, headers["isactive"]].Value?.ToString() ?? "true")
+                                var isActive = headers.ContainsKey(kIsActive)
+                                    ? ParseBool(worksheet.Cells[row, headers[kIsActive]].Value?.ToString() ?? "true")
                                     : true;
 
                                 int? orderNumber = null;
-                                if (headers.ContainsKey("sira_numarasi"))
+                                if (headers.ContainsKey(kOrderNumber))
                                 {
-                                    var orderCell = worksheet.Cells[row, headers["sira_numarasi"]].Value;
+                                    var orderCell = worksheet.Cells[row, headers[kOrderNumber]].Value;
                                     if (orderCell != null)
                                     {
                                         try { orderNumber = Convert.ToInt32(orderCell); }
@@ -306,8 +341,9 @@ namespace WebUI.Helper
                                 {
                                     existing.Description = description;
                                     if (!string.IsNullOrEmpty(image)) existing.Image = image;
+                                    existing.ParentId = parentId;
                                     existing.ISTopMenu = isTopMenu;
-                                    existing.IsActive = isActive;
+                                    existing.Status = isActive ? DataStatus.Active : DataStatus.Draft;
                                     if (orderNumber.HasValue) existing.OrderNumber = orderNumber;
                                     existing.UpdatedDate = DateTime.Now;
                                     categoriesToUpdate.Add(existing);
@@ -320,8 +356,9 @@ namespace WebUI.Helper
                                         Title = title,
                                         Description = description,
                                         Image = image,
+                                        ParentId = parentId,
                                         ISTopMenu = isTopMenu,
-                                        IsActive = isActive,
+                                        Status = isActive ? DataStatus.Active : DataStatus.Draft,
                                         OrderNumber = orderNumber
                                     });
                                     successCount++;
@@ -393,17 +430,25 @@ namespace WebUI.Helper
                         var headers = new Dictionary<string, int>();
                         for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                         {
-                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower().Trim();
+                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower(System.Globalization.CultureInfo.GetCultureInfo("tr-TR")).Trim();
                             if (!string.IsNullOrEmpty(headerValue))
                             {
                                 headers[headerValue] = col;
                             }
                         }
 
-                        // Gerekli sütunları kontrol et
-                        if (!headers.ContainsKey("title"))
+                        // Sütun başlıklarını entity Display adlarından türet
+                        var trCulture    = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+                        var kTitle       = GetDisplayName<News>(nameof(News.Title)).ToLower(trCulture);
+                        var kDescription = GetDisplayName<News>(nameof(News.Description)).ToLower(trCulture);
+                        var kImage       = GetDisplayName<News>(nameof(News.Image)).ToLower(trCulture);
+                        var kIsActive    = GetDisplayName<News>(nameof(News.Status)).ToLower(trCulture);
+                        var kOrderNumber = GetDisplayName<News>(nameof(News.OrderNumber)).ToLower(trCulture);
+
+                        // Gerekli sütunları kontrol et — başlıklar örnek Excel ile birebir eşleşmeli
+                        if (!headers.ContainsKey(kTitle))
                         {
-                            errors.Add("Excel dosyasında 'Title' sütunu bulunamadı.");
+                            errors.Add($"Excel dosyasında zorunlu '{GetDisplayName<News>(nameof(News.Title))}' sütunu bulunamadı.");
                             return (0, 0, errors);
                         }
 
@@ -412,28 +457,28 @@ namespace WebUI.Helper
                         {
                             try
                             {
-                                var title = worksheet.Cells[row, headers["title"]].Value?.ToString()?.Trim();
+                                var title = worksheet.Cells[row, headers[kTitle]].Value?.ToString()?.Trim();
 
                                 if (string.IsNullOrEmpty(title))
                                 {
-                                    errors.Add($"Satır {row}: Haber başlığı boş olamaz.");
+                                    errors.Add($"Satır {row}: Kampanya başlığı boş olamaz.");
                                     continue;
                                 }
 
-                                var description = headers.ContainsKey("description")
-                                    ? worksheet.Cells[row, headers["description"]].Value?.ToString()?.Trim()
+                                var description = headers.ContainsKey(kDescription)
+                                    ? worksheet.Cells[row, headers[kDescription]].Value?.ToString()?.Trim()
                                     : null;
-                                var image = headers.ContainsKey("image")
-                                    ? worksheet.Cells[row, headers["image"]].Value?.ToString()?.Trim()
+                                var image = headers.ContainsKey(kImage)
+                                    ? worksheet.Cells[row, headers[kImage]].Value?.ToString()?.Trim()
                                     : null;
-                                var isActive = headers.ContainsKey("isactive") || headers.ContainsKey("aktif")
-                                    ? ParseBool(worksheet.Cells[row, headers.ContainsKey("isactive") ? headers["isactive"] : headers["aktif"]].Value?.ToString() ?? "true")
+                                var isActive = headers.ContainsKey(kIsActive)
+                                    ? ParseBool(worksheet.Cells[row, headers[kIsActive]].Value?.ToString() ?? "true")
                                     : true;
 
                                 int? orderNumber = null;
-                                if (headers.ContainsKey("sira_numarasi"))
+                                if (headers.ContainsKey(kOrderNumber))
                                 {
-                                    var orderCell = worksheet.Cells[row, headers["sira_numarasi"]].Value;
+                                    var orderCell = worksheet.Cells[row, headers[kOrderNumber]].Value;
                                     if (orderCell != null)
                                     {
                                         try { orderNumber = Convert.ToInt32(orderCell); }
@@ -453,7 +498,7 @@ namespace WebUI.Helper
                                 {
                                     existing.Description = description;
                                     if (!string.IsNullOrEmpty(image)) existing.Image = image;
-                                    existing.IsActive = isActive;
+                                    existing.Status = isActive ? DataStatus.Active : DataStatus.Draft;
                                     if (orderNumber.HasValue) existing.OrderNumber = orderNumber;
                                     existing.UpdatedDate = DateTime.Now;
                                     newsToUpdate.Add(existing);
@@ -466,7 +511,7 @@ namespace WebUI.Helper
                                         Title = title,
                                         Description = description,
                                         Image = image,
-                                        IsActive = isActive,
+                                        Status = isActive ? DataStatus.Active : DataStatus.Draft,
                                         OrderNumber = orderNumber
                                     });
                                     successCount++;
@@ -538,17 +583,26 @@ namespace WebUI.Helper
                         var headers = new Dictionary<string, int>();
                         for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                         {
-                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower().Trim();
+                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower(System.Globalization.CultureInfo.GetCultureInfo("tr-TR")).Trim();
                             if (!string.IsNullOrEmpty(headerValue))
                             {
                                 headers[headerValue] = col;
                             }
                         }
 
-                        // Gerekli sütunları kontrol et
-                        if (!headers.ContainsKey("title"))
+                        // Sütun başlıklarını entity Display adlarından türet
+                        var trCulture    = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+                        var kTitle       = GetDisplayName<Slider>(nameof(Slider.Title)).ToLower(trCulture);
+                        var kDescription = GetDisplayName<Slider>(nameof(Slider.Description)).ToLower(trCulture);
+                        var kImage       = GetDisplayName<Slider>(nameof(Slider.Image)).ToLower(trCulture);
+                        const string kLink = "bağlantı"; // Slider'da bağlantı alanı Slug'a eşlenir
+                        var kIsActive    = GetDisplayName<Slider>(nameof(Slider.Status)).ToLower(trCulture);
+                        var kOrderNumber = GetDisplayName<Slider>(nameof(Slider.OrderNumber)).ToLower(trCulture);
+
+                        // Gerekli sütunları kontrol et — başlıklar örnek Excel ile birebir eşleşmeli
+                        if (!headers.ContainsKey(kTitle))
                         {
-                            errors.Add("Excel dosyasında 'Title' sütunu bulunamadı.");
+                            errors.Add($"Excel dosyasında zorunlu '{GetDisplayName<Slider>(nameof(Slider.Title))}' sütunu bulunamadı.");
                             return (0, 0, errors);
                         }
 
@@ -557,7 +611,7 @@ namespace WebUI.Helper
                         {
                             try
                             {
-                                var title = worksheet.Cells[row, headers["title"]].Value?.ToString()?.Trim();
+                                var title = worksheet.Cells[row, headers[kTitle]].Value?.ToString()?.Trim();
 
                                 if (string.IsNullOrEmpty(title))
                                 {
@@ -565,23 +619,23 @@ namespace WebUI.Helper
                                     continue;
                                 }
 
-                                var description = headers.ContainsKey("description")
-                                    ? worksheet.Cells[row, headers["description"]].Value?.ToString()?.Trim()
+                                var description = headers.ContainsKey(kDescription)
+                                    ? worksheet.Cells[row, headers[kDescription]].Value?.ToString()?.Trim()
                                     : null;
-                                var image = headers.ContainsKey("image")
-                                    ? worksheet.Cells[row, headers["image"]].Value?.ToString()?.Trim()
+                                var image = headers.ContainsKey(kImage)
+                                    ? worksheet.Cells[row, headers[kImage]].Value?.ToString()?.Trim()
                                     : null;
-                                var link = headers.ContainsKey("link")
-                                    ? worksheet.Cells[row, headers["link"]].Value?.ToString()?.Trim()
+                                var link = headers.ContainsKey(kLink)
+                                    ? worksheet.Cells[row, headers[kLink]].Value?.ToString()?.Trim()
                                     : null;
-                                var isActive = headers.ContainsKey("isactive") || headers.ContainsKey("aktif")
-                                    ? ParseBool(worksheet.Cells[row, headers.ContainsKey("isactive") ? headers["isactive"] : headers["aktif"]].Value?.ToString() ?? "true")
+                                var isActive = headers.ContainsKey(kIsActive)
+                                    ? ParseBool(worksheet.Cells[row, headers[kIsActive]].Value?.ToString() ?? "true")
                                     : true;
 
                                 int? orderNumber = null;
-                                if (headers.ContainsKey("sira_numarasi"))
+                                if (headers.ContainsKey(kOrderNumber))
                                 {
-                                    var orderCell = worksheet.Cells[row, headers["sira_numarasi"]].Value;
+                                    var orderCell = worksheet.Cells[row, headers[kOrderNumber]].Value;
                                     if (orderCell != null)
                                     {
                                         try { orderNumber = Convert.ToInt32(orderCell); }
@@ -601,8 +655,8 @@ namespace WebUI.Helper
                                 {
                                     existing.Description = description;
                                     if (!string.IsNullOrEmpty(image)) existing.Image = image;
-                                    existing.Link = link;
-                                    existing.IsActive = isActive;
+                                    existing.Slug = link;
+                                    existing.Status = isActive ? DataStatus.Active : DataStatus.Draft;
                                     if (orderNumber.HasValue) existing.OrderNumber = orderNumber;
                                     existing.UpdatedDate = DateTime.Now;
                                     slidersToUpdate.Add(existing);
@@ -615,8 +669,8 @@ namespace WebUI.Helper
                                         Title = title,
                                         Description = description,
                                         Image = image,
-                                        Link = link,
-                                        IsActive = isActive,
+                                        Slug = link,
+                                        Status = isActive ? DataStatus.Active : DataStatus.Draft,
                                         OrderNumber = orderNumber
                                     });
                                     successCount++;
@@ -660,8 +714,8 @@ namespace WebUI.Helper
             var errors = new List<string>();
             int successCount = 0;
             int updateCount = 0;
-            var productsToAdd = new List<Core.Entities.Product>();
-            var productsToUpdate = new List<Core.Entities.Product>();
+            var productsToAdd = new List<Product>();
+            var productsToUpdate = new List<Product>();
 
             try
             {
@@ -671,7 +725,7 @@ namespace WebUI.Helper
                 using (var stream = new MemoryStream())
                 {
                     await file.CopyToAsync(stream);
-                    using (var package = new OfficeOpenXml.ExcelPackage(stream))
+                    using (var package = new ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets.FirstOrDefault();
                         if (worksheet == null)
@@ -690,14 +744,29 @@ namespace WebUI.Helper
                         var headers = new Dictionary<string, int>();
                         for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                         {
-                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower().Trim();
+                            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.ToLower(System.Globalization.CultureInfo.GetCultureInfo("tr-TR")).Trim();
                             if (!string.IsNullOrEmpty(headerValue))
                                 headers[headerValue] = col;
                         }
 
-                        if (!headers.ContainsKey("urun_adi"))
+                        // Sütun başlıklarını entity Display adlarından türet
+                        var trCulture    = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+                        var kTitle       = GetDisplayName<Product>(nameof(Product.Title)).ToLower(trCulture);
+                        var kDescription = GetDisplayName<Product>(nameof(Product.Description)).ToLower(trCulture);
+                        var kImage       = GetDisplayName<Product>(nameof(Product.Image)).ToLower(trCulture);
+                        var kProductCode = GetDisplayName<Product>(nameof(Product.ProductCode)).ToLower(trCulture);
+                        var kPrice       = GetDisplayName<Product>(nameof(Product.Price)).ToLower(trCulture);
+                        var kStockCount  = GetDisplayName<Product>(nameof(Product.StockCount)).ToLower(trCulture);
+                        var kCategoryId  = GetDisplayName<Product>(nameof(Product.CategoryId)).ToLower(trCulture);
+                        var kBrandId     = GetDisplayName<Product>(nameof(Product.BrandId)).ToLower(trCulture);
+                        var kIsActive    = GetDisplayName<Product>(nameof(Product.Status)).ToLower(trCulture);
+                        var kIsHome      = GetDisplayName<Product>(nameof(Product.IsHome)).ToLower(trCulture);
+                        var kOrderNumber = GetDisplayName<Product>(nameof(Product.OrderNumber)).ToLower(trCulture);
+
+                        // Gerekli sütunları kontrol et — başlıklar örnek Excel ile birebir eşleşmeli
+                        if (!headers.ContainsKey(kTitle))
                         {
-                            errors.Add("Excel dosyasında 'urun_adi' sütunu bulunamadı.");
+                            errors.Add($"Excel dosyasında zorunlu '{GetDisplayName<Product>(nameof(Product.Title))}' sütunu bulunamadı.");
                             return (0, 0, errors);
                         }
 
@@ -705,25 +774,29 @@ namespace WebUI.Helper
                         {
                             try
                             {
-                                var title = worksheet.Cells[row, headers["urun_adi"]].Value?.ToString()?.Trim();
+                                var title = worksheet.Cells[row, headers[kTitle]].Value?.ToString()?.Trim();
                                 if (string.IsNullOrEmpty(title))
                                 {
                                     errors.Add($"Satır {row}: Ürün adı boş olamaz.");
                                     continue;
                                 }
 
-                                var description = headers.ContainsKey("aciklama")
-                                    ? worksheet.Cells[row, headers["aciklama"]].Value?.ToString()?.Trim()
+                                var description = headers.ContainsKey(kDescription)
+                                    ? worksheet.Cells[row, headers[kDescription]].Value?.ToString()?.Trim()
                                     : null;
 
-                                var productCode = headers.ContainsKey("urun_kodu")
-                                    ? worksheet.Cells[row, headers["urun_kodu"]].Value?.ToString()?.Trim()
+                                var image = headers.ContainsKey(kImage)
+                                    ? worksheet.Cells[row, headers[kImage]].Value?.ToString()?.Trim()
+                                    : null;
+
+                                var productCode = headers.ContainsKey(kProductCode)
+                                    ? worksheet.Cells[row, headers[kProductCode]].Value?.ToString()?.Trim()
                                     : null;
 
                                 decimal price = 0;
-                                if (headers.ContainsKey("fiyat"))
+                                if (headers.ContainsKey(kPrice))
                                 {
-                                    var priceCell = worksheet.Cells[row, headers["fiyat"]].Value;
+                                    var priceCell = worksheet.Cells[row, headers[kPrice]].Value;
                                     if (priceCell != null)
                                     {
                                         try { price = Convert.ToDecimal(priceCell); }
@@ -732,9 +805,9 @@ namespace WebUI.Helper
                                 }
 
                                 int stockCount = 0;
-                                if (headers.ContainsKey("stok"))
+                                if (headers.ContainsKey(kStockCount))
                                 {
-                                    var stockCell = worksheet.Cells[row, headers["stok"]].Value;
+                                    var stockCell = worksheet.Cells[row, headers[kStockCount]].Value;
                                     if (stockCell != null)
                                     {
                                         try { stockCount = Convert.ToInt32(stockCell); }
@@ -743,9 +816,9 @@ namespace WebUI.Helper
                                 }
 
                                 int? categoryId = null;
-                                if (headers.ContainsKey("kategori"))
+                                if (headers.ContainsKey(kCategoryId))
                                 {
-                                    var catName = worksheet.Cells[row, headers["kategori"]].Value?.ToString()?.Trim();
+                                    var catName = worksheet.Cells[row, headers[kCategoryId]].Value?.ToString()?.Trim();
                                     if (!string.IsNullOrEmpty(catName))
                                     {
                                         var cat = categories.FirstOrDefault(c => c.Title.Equals(catName, StringComparison.OrdinalIgnoreCase));
@@ -755,9 +828,9 @@ namespace WebUI.Helper
                                 }
 
                                 int? brandId = null;
-                                if (headers.ContainsKey("marka"))
+                                if (headers.ContainsKey(kBrandId))
                                 {
-                                    var brandName = worksheet.Cells[row, headers["marka"]].Value?.ToString()?.Trim();
+                                    var brandName = worksheet.Cells[row, headers[kBrandId]].Value?.ToString()?.Trim();
                                     if (!string.IsNullOrEmpty(brandName))
                                     {
                                         var brand = brands.FirstOrDefault(b => b.Name.Equals(brandName, StringComparison.OrdinalIgnoreCase));
@@ -766,18 +839,18 @@ namespace WebUI.Helper
                                     }
                                 }
 
-                                var isActive = headers.ContainsKey("durum")
-                                    ? ParseBool(worksheet.Cells[row, headers["durum"]].Value?.ToString() ?? "true")
+                                var isActive = headers.ContainsKey(kIsActive)
+                                    ? ParseBool(worksheet.Cells[row, headers[kIsActive]].Value?.ToString() ?? "true")
                                     : true;
 
-                                var isHome = headers.ContainsKey("anasayfa")
-                                    ? ParseBool(worksheet.Cells[row, headers["anasayfa"]].Value?.ToString() ?? "false")
+                                var isHome = headers.ContainsKey(kIsHome)
+                                    ? ParseBool(worksheet.Cells[row, headers[kIsHome]].Value?.ToString() ?? "false")
                                     : false;
 
                                 int? orderNumber = null;
-                                if (headers.ContainsKey("sira_numarasi"))
+                                if (headers.ContainsKey(kOrderNumber))
                                 {
-                                    var orderCell = worksheet.Cells[row, headers["sira_numarasi"]].Value;
+                                    var orderCell = worksheet.Cells[row, headers[kOrderNumber]].Value;
                                     if (orderCell != null)
                                     {
                                         try { orderNumber = Convert.ToInt32(orderCell); }
@@ -789,7 +862,7 @@ namespace WebUI.Helper
                                     }
                                 }
 
-                                Core.Entities.Product? existing = null;
+                                Product? existing = null;
                                 if (!string.IsNullOrEmpty(productCode))
                                     existing = _context.Products.FirstOrDefault(p => p.ProductCode == productCode);
                                 if (existing == null)
@@ -800,12 +873,13 @@ namespace WebUI.Helper
                                 {
                                     existing.Title = title;
                                     existing.Description = description;
+                                    if (!string.IsNullOrEmpty(image)) existing.Image = image;
                                     if (!string.IsNullOrEmpty(productCode)) existing.ProductCode = productCode;
                                     existing.Price = price;
                                     existing.StockCount = stockCount;
                                     if (categoryId.HasValue) existing.CategoryId = categoryId;
                                     if (brandId.HasValue) existing.BrandId = brandId;
-                                    existing.IsActive = isActive;
+                                    existing.Status = isActive ? DataStatus.Active : DataStatus.Draft;
                                     existing.IsHome = isHome;
                                     if (orderNumber.HasValue) existing.OrderNumber = orderNumber;
                                     existing.UpdatedDate = DateTime.Now;
@@ -814,16 +888,17 @@ namespace WebUI.Helper
                                 }
                                 else if (existing == null)
                                 {
-                                    productsToAdd.Add(new Core.Entities.Product
+                                    productsToAdd.Add(new Product
                                     {
                                         Title = title,
                                         Description = description,
+                                        Image = image,
                                         ProductCode = productCode,
                                         Price = price,
                                         StockCount = stockCount,
                                         CategoryId = categoryId,
                                         BrandId = brandId,
-                                        IsActive = isActive,
+                                        Status = isActive ? DataStatus.Active : DataStatus.Draft,
                                         IsHome = isHome,
                                         OrderNumber = orderNumber
                                     });
@@ -875,6 +950,14 @@ namespace WebUI.Helper
                 new { SuccessCount = successCount, UpdateCount = updateCount, Errors = errors, TotalErrors = errors.Count });
 
             return (successCount, updateCount, errors);
+        }
+
+        private static string GetDisplayName<T>(string propertyName)
+        {
+            return typeof(T)
+                .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
+                ?.GetCustomAttribute<DisplayAttribute>()
+                ?.Name ?? propertyName;
         }
 
         private bool ParseBool(string value)

@@ -1,0 +1,214 @@
+﻿@model ContactViewModel
+
+@{
+    ViewData["Title"] = "İletişim Sayfası";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/page/contact.css" />
+}
+
+<section class="page-hero">
+    <div class="page-hero-grid" aria-hidden="true"></div>
+    <div class="container">
+        <div class="page-hero-inner">
+            <div class="page-hero-eyebrow">
+                <i class="fa fa-envelope" aria-hidden="true"></i> Bize Ulaşın
+            </div>
+            <h1 class="page-hero-title">İletişim</h1>
+            <p class="page-hero-sub">
+                Sorularınız veya teklif talepleriniz için uzman ekibimizle
+                iletişime geçin.
+            </p>
+        </div>
+        <span class="page-hero-bg-num" aria-hidden="true">05</span>
+    </div>
+</section>
+
+<section class="sec bg-bg"
+         aria-label="İletişim Formu ve Bilgileri">
+    <div class="container">
+        <div class="row g-5">
+
+            <div class="col-lg-4">
+                <address class="contact-card font-normal">
+                    <div class="sec-label mb-10">
+                        İletişim Bilgileri
+                    </div>
+                    <h2 class="fs-2xl mb-24">
+                        Bize Ulaşın
+                    </h2>
+                    <div class="ci-item">
+                        <div class="ci-icon">
+                            <i class="fa fa-map-marker-alt" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="ci-lbl">Adres</div>
+                            <div class="ci-val">
+                                Merkez Mah. Şifalı Su OSB Cad. Poliprofil Blok No. 10
+                                Gümüşova / Düzce
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ci-item">
+                        <div class="ci-icon">
+                            <i class="fa fa-phone" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="ci-lbl">Telefon</div>
+                            <div class="ci-val">
+                                <a href="tel:+905531048108">+90 553 104 81 08</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ci-item">
+                        <div class="ci-icon">
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="ci-lbl">E-posta</div>
+                            <div class="ci-val">
+                                <a href="mailto:info@askarprofil.com">info@askarprofil.com</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ci-item">
+                        <div class="ci-icon">
+                            <i class="fa fa-clock" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="ci-lbl">Çalışma Saatleri</div>
+                            <div class="ci-val">
+                                Pzt–Cum: 08:00–18:00<br />Cumartesi–Pazar: Kapalı
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-18 mt-4">
+                        <div class="fs-11px fw-800 text-muted ls-13 uppercase mb-10">
+                            Sosyal Medya
+                        </div>
+                        <div class="social-row">
+                            <a href="#" class="soc-btn" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+                            <a href="#" class="soc-btn" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                            <a href="#" class="soc-btn" aria-label="WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+                            <a href="#" class="soc-btn" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                </address>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="contact-card">
+                    <div class="sec-label mb-10">
+                        Mesaj Gönder
+                    </div>
+                    <h2 class="fs-2xl mb-28">
+                        Bize Yazın
+                    </h2>
+
+                    <form asp-controller="Contact" asp-action="Index" method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+                        <div class="row g-3">
+
+                            <div class="col-sm-6">
+                                <div class="frow">
+                                    <label class="flbl" asp-for="@Model.IncomingMessage.FullName"></label>
+                                    <input class="finp"
+                                           asp-for="@Model.IncomingMessage.FullName"
+                                           type="text"
+                                           placeholder="Adınız Soyadınız" />
+
+                                    <span asp-validation-for="IncomingMessage.FullName"
+                                          class="text-danger fs-12px mt-1"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="frow">
+                                    <label class="flbl" asp-for="@Model.IncomingMessage.Email"></label>
+                                    <input class="finp"
+                                           asp-for="@Model.IncomingMessage.Email"
+                                           type="email"
+                                           placeholder="ornek@email.com" />
+
+                                    <span asp-validation-for="IncomingMessage.Email"
+                                          class="text-danger fs-12px mt-1"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="frow">
+                                    <label class="flbl" asp-for="@Model.IncomingMessage.Phone"></label>
+                                    <input class="finp"
+                                           asp-for="@Model.IncomingMessage.Phone"
+                                           type="tel"
+                                           placeholder="+90 XXX XXX XX XX" />
+
+                                    <span asp-validation-for="IncomingMessage.Phone"
+                                          class="text-danger fs-12px mt-1"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="frow">
+                                    <label class="flbl" asp-for="@Model.IncomingMessage.Subject"></label>
+                                    <select class="finp" asp-for="@Model.IncomingMessage.Subject">
+                                        <option value="">Konu Seçin</option>
+                                        <option>Ürün Bilgisi</option>
+                                        <option>Teknik Destek</option>
+                                        <option>Fiyat Teklifi</option>
+                                        <option>İş Birliği</option>
+                                    </select>
+
+                                    <span asp-validation-for="IncomingMessage.Subject"
+                                          class="text-danger fs-12px mt-1"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="frow">
+                                    <label class="flbl" asp-for="@Model.IncomingMessage.Message"></label>
+                                    <textarea class="finp"
+                                              asp-for="@Model.IncomingMessage.Message"
+                                              rows="5"
+                                              placeholder="Mesajınızı yazın..."></textarea>
+
+                                    <span asp-validation-for="IncomingMessage.Message"
+                                          class="text-danger fs-12px mt-1"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex align-items-center gap-9 mb-18">
+                                    <input type="checkbox"
+                                           id="kvkk"
+                                           class="w-15 h-15 accent-primary cursor-pointer shrink-0" />
+                                    <label for="kvkk"
+                                           class="fs-12px text-muted cursor-pointer">Kişisel verilerimin işlenmesine izin veriyorum.</label>
+                                </div>
+                                <button class="btn-p w-full justify-content-center"
+                                        type="submit">
+                                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                    Gönder
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

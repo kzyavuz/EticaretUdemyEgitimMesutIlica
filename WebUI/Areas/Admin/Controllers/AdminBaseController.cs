@@ -1,13 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using WebUI.Controllers;
 using WebUI.Helper;
 
 namespace WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Policy = "AdminPolicy")]
     public class AdminBaseController : BaseController
     {
+        /// <summary>
+        /// Verilen entity tipinin belirtilen property'leri için [Display(Name)] değerlerini döner.
+        /// Display attribute yoksa property adını döner.
+        /// </summary>
+        protected static string DisplayName<TEntity>(string propertyName)
+        {
+            return typeof(TEntity)
+                .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
+                ?.GetCustomAttribute<DisplayAttribute>()
+                ?.Name ?? propertyName;
+        }
+
         protected IActionResult DownloadSampleExcel(string fileName, (string Name, bool Required)[] columns, object[] sampleRow)
         {
             using var package = new ExcelPackage();

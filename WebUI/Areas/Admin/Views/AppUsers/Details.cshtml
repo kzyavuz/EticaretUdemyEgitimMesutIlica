@@ -4,7 +4,7 @@
     ViewData["Title"] = "Kullanıcı Detayları";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     var userRoles = ViewBag.UserRoles as IList<string> ?? new List<string>();
-    var fullName = ((Model.FirstName ?? "") + " " + (Model.LastName ?? "")).Trim();
+    var fullName = Model.FullName;
 }
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -97,21 +97,12 @@
                 @{
                     string? imageSrc = ResolveImageSrc(Model.Image);
                 }
-                @if (imageSrc != null)
-                {
-                    <a href="@imageSrc" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
-                           title="Tam boyutta görüntüle">
-                        <img class="rounded-circle ratio-1x1 object-fit-cover" src="@imageSrc" alt="Ürün Görseli"
-                             height="100" width="100" loading="lazy" />
-                    </a>
-                }
-                else
-                {
-                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                         style="width:100px;height:100px">
-                        <i class="fas fa-user fa-2x text-muted"></i>
-                    </div>
-                }
+                <a href="@imageSrc" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                       title="Tam boyutta görüntüle">
+                    <img class="rounded-circle ratio-1x1 object-fit-cover" src="@imageSrc" alt="Ürün Görseli"
+                         height="100" width="100" loading="lazy" />
+                </a>
+                
                 <p class="fw-semibold mb-0 mt-3">@fullName</p>
                 <small class="text-muted">@Model.Email</small>
             </div>
@@ -119,10 +110,10 @@
 
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4 d-grid gap-2">
-                <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-warning">
+                <a asp-action="Form" asp-route-id="@Model.Id" class="btn btn-outline-warning">
                     <i class="fas fa-pen-to-square me-2"></i>Düzenle
                 </a>
-                <button type="button" class="btn btn-danger"
+                <button type="button" class="btn btn-outline-danger"
                         onclick="confirmDelete(null, '@Html.Raw(fullName.Replace("'", "\\'"))', 'Kullanıcıyı Sil')">
                     <i class="fas fa-trash me-2"></i>Sil
                 </button>

@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Core.Entities;
+﻿using Core.Entities;
+using Service.Extensions;
 using Data.Context;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebUI.Areas.Admin.Models;
 using WebUI.Helper;
 
 namespace WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
     public class NewsController : AdminBaseController
     {
         private readonly DatabaseContext _context;
@@ -26,57 +27,91 @@ namespace WebUI.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.News.ToListAsync());
+            List<News>? data = await _context.News
+                .OrderByDescending(x => x.CreatedDate)
+                .ToListAsync();
+
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Kampanyalar"}
+            };
+
+            List<StartCardModel> startCards = new()
+            {
+                new StartCardModel
+                {
+                    Title = "Tüm Kampanyalar",
+                    Value = data.Count,
+                    Class = "info",
+                    Tooltip = "Sitede bulunan toplam duyuru sayısı",
+                    Icon = "fa-solid fa-list"
+                },
+                new StartCardModel
+                {
+                    Title = "Aktif Kampanyalar",
+                    Value = data.Count(p => FunctionHelper.IsActive(p.Status)),
+                    Class = "success",
+                    Tooltip = "Sitede aktif durumda olan duyuru sayısı",
+                    Icon = "fa-solid fa-check"
+                },
+                new StartCardModel
+                {
+                    Title = "Taslak Kampanyalar",
+                    Value = data.Count(p => FunctionHelper.IsDraft(p.Status)),
+                    Class = "secondary",
+                    Tooltip = "Sitede taslak durumda olan duyuru sayısı",
+                    Icon = "fa-solid fa-file"
+                }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+            ViewBag.StartCards = startCards;
+
+            return View(data);
         }
 
-        [HttpPost]
-        public Task<IActionResult> ImportExcel(IFormFile file)
-            => ExcelImport(file, _excelHelper.ImportNewsAsync,
-                (s, u) => $"{s} haber eklendi, {u} haber güncellendi.");
-
-        [HttpGet]
-        public IActionResult DownloadSampleExcel()
-            => DownloadSampleExcel("haberler_ornek.xlsx",
-                new[] {
-                    ("title", true),
-                    ("description", false),
-                    ("image", false),
-                    ("isactive", false),
-                    ("sira_numarasi", false)
-                },
-                new object[] { "Örnek Haber Başlığı", "Haber içeriği buraya gelecek", "", "evet", 1 });
-
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var model = await _context.News
+            News? data = await _context.News
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (model == null)
+
+            if (data == null)
             {
                 return NotFound();
             }
 
-            return View(model);
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Kampanyalar", Controller= "News", Action = "Index" },
+                new BreadcrumbItem { Title = data.Title }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
+            return View(data);
         }
 
         public async Task<IActionResult> Form(int? id)
         {
-            if (id == null)
+            News? data = new();
+
+            if (id.HasValue)
             {
-                return View();
+                data = await _context.News.FindAsync(id);
+
+                if (data == null)
+                    return NotFound();
             }
 
-            var model = await _context.News.FindAsync(id);
-
-            if (model == null)
+            List<BreadcrumbItem> breadcrumbs = new()
             {
-                return NotFound();
-            }
-            return View(model);
+                new BreadcrumbItem { Title = "Kampanyalar", Controller= "News", Action = "Index" },
+                new BreadcrumbItem { Title = data?.Title ?? "Yeni Kampanya" }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
+            return View(data);
         }
 
         [HttpPost]
@@ -92,7 +127,7 @@ namespace WebUI.Areas.Admin.Controllers
 
             _context.Add(model);
             await _context.SaveChangesAsync();
-            SetSweetAlertMessage("Başarılı", "Haber başarıyla oluşturuldu.", "success");
+            SetSweetAlertMessage("Başarılı", "Kampanya başarıyla oluşturuldu.", "success");
 
             return RedirectToAction(nameof(Index));
         }
@@ -113,7 +148,7 @@ namespace WebUI.Areas.Admin.Controllers
 
                     _context.Update(model);
                     await _context.SaveChangesAsync();
-                    SetSweetAlertMessage("Başarılı", "Haber başarıyla güncellendi.", "success");
+                    SetSweetAlertMessage("Başarılı", "Kampanya başarıyla güncellendi.", "success");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -133,7 +168,7 @@ namespace WebUI.Areas.Admin.Controllers
 
             if (model == null)
             {
-                SetSweetAlertMessage("Hata", "Haber bulunamadı.", "error");
+                SetSweetAlertMessage("Hata", "Kampanya bulunamadı.", "error");
                 return RedirectToAction(nameof(Index));
             }
 
@@ -143,9 +178,49 @@ namespace WebUI.Areas.Admin.Controllers
             if (!string.IsNullOrEmpty(model.Image))
                 _fileHelper.Delete(model.Image);
 
-            SetSweetAlertMessage("Başarılı", "Haber başarıyla silindi.", "success");
+            SetSweetAlertMessage("Başarılı", "Kampanya başarıyla silindi.", "success");
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkDelete(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                SetSweetAlertMessage("Hata", "Silinecek kayıt seçilmedi.", "error");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var items = await _context.News.Where(n => ids.Contains(n.Id)).ToListAsync();
+            foreach (var item in items)
+                if (!string.IsNullOrEmpty(item.Image))
+                    _fileHelper.Delete(item.Image);
+
+            _context.News.RemoveRange(items);
+            await _context.SaveChangesAsync();
+
+            SetSweetAlertMessage("Başarılı", $"{items.Count} haber silindi.", "success");
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        public Task<IActionResult> ImportExcel(IFormFile file)
+            => ExcelImport(file, _excelHelper.ImportNewsAsync,
+                (s, u) => $"{s} haber eklendi, {u} haber güncellendi.");
+
+        [HttpGet]
+        public IActionResult DownloadSampleExcel()
+            => DownloadSampleExcel("haberler_ornek.xlsx",
+                new[] {
+                    (DisplayName<News>(nameof(News.Title)), true),
+                    (DisplayName<News>(nameof(News.Description)), false),
+                    (DisplayName<News>(nameof(News.Image)), false),
+                    (DisplayName<News>(nameof(News.Status)), false),
+                    (DisplayName<News>(nameof(News.OrderNumber)), false)
+                },
+                new object[] { "Örnek Kampanya Başlığı", "Kampanya içeriği buraya gelecek", "", "evet", 1 });
 
         private bool NewsExists(int id)
         {

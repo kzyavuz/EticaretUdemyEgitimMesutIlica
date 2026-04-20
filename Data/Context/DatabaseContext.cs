@@ -14,6 +14,10 @@ namespace Data.Context
         public DbSet<News> News { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Slider> Sliders { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Favories> Favories { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Adress> Adresses { get; set; }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 

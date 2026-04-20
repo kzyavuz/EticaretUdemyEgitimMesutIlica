@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Abstract;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
 {
@@ -12,8 +13,5 @@ namespace Core.Entities
 
         [Display(Name = "Slider Görseli")]
         public string? Image { get; set; }
-
-        [Display(Name = "Link")]
-        public string? Link { get; set; }
     }
 }

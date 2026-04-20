@@ -6,16 +6,11 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex align-items-center gap-2 mb-4">
-    <div class="bg-primary bg-opacity-10 rounded p-2">
-        <i class="fas @(isEdit ? "fa-pen-to-square" : "fa-shield-halved") text-primary"></i>
-    </div>
-    <div>
-        <h4 class="mb-0 fw-semibold">@ViewData["Title"]</h4>
-        <small class="text-muted">
-            @(isEdit ? "Rol bilgilerini güncelleyin" : "Yeni rol bilgilerini aşağıya girin")
-        </small>
-    </div>
+
+<div class="page-header">
+
+    <partial name="~/Areas/Admin/Views/PartialViews/_Breadcrumb.cshtml" model="@ViewBag.Breadcrumbs" />
+
 </div>
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" method="post">

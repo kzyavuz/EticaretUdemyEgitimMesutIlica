@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Product>
+@model IEnumerable<Product>
 
 @{
     ViewData["Title"] = "Ürünler";
@@ -8,16 +8,25 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="fas fa-box me-2"></i>Ürün Yönetimi</h1>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-outline-success" id="importBtn"
-                data-bs-toggle="tooltip" data-bs-placement="top" title="Excel'den ürün aktar">
+        <button type="button" class="btn btn-outline-success" id="importBtn" data-bs-toggle="tooltip"
+                data-bs-placement="top" title="Excel'den ürün aktar">
             <i class="fas fa-file-excel me-2"></i>Excel İçeri Aktar
         </button>
-        <a asp-action="ExportExcel" class="btn btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Ürünleri Excel olarak indir">
+        <a asp-action="ExportExcel" class="btn btn-outline-success" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Ürünleri Excel olarak indir">
             <i class="fas fa-file-excel me-2"></i>Excel İndir
         </a>
-        <a asp-action="Form" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Yeni ürün eklemek için tıklayın">
+        <a asp-action="Form" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+               title="Yeni ürün eklemek için tıklayın">
             <i class="fas fa-circle-plus me-2"></i>Yeni Ürün Ekle
         </a>
+        <button type="button" class="btn btn-outline-danger" id="bulkDeleteBtn" data-bs-toggle="tooltip"
+                data-bs-placement="top" title="Toplu silme modunu aç/kapat">
+            <i class="fas fa-trash-can me-2"></i>Toplu Sil
+        </button>
+        <button type="button" class="btn btn-outline-danger d-none" id="confirmBulkDeleteBtn">
+            <i class="fas fa-check me-2"></i>Seçilenleri Sil
+        </button>
     </div>
 </div>
 
@@ -38,14 +47,20 @@
                     <th>@Html.DisplayNameFor(model => model.First().StockCount)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Category.Title)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Brand.Name)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().IsActive)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Status)</th>
                     <th>@Html.DisplayNameFor(model => model.First().IsHome)</th>
                     <th>@Html.DisplayNameFor(model => model.First().CreatedDate)</th>
                     <th>İşlemler</th>
+                    <th class="bulk-check-col" data-sortable="false">
+                        <input type="checkbox" id="selectAllCheck"
+                               title="Tümünü seç" />
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                @{int index = 1;}
+                @{
+                    int index = 1;
+                }
                 @foreach (var item in Model)
                 {
                     <tr>
@@ -81,10 +96,8 @@
                         </td>
                         <td>@(item.Category?.Title ?? "-")</td>
                         <td>@(item.Brand?.Name ?? "-")</td>
-                        <td>
-                            <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
-                                @(item.IsActive ? "Evet" : "Hayır")
-                            </span>
+                        <td> 
+                            @StatusBadge(item.Status)
                         </td>
                         <td>
                             <span class="badge @(item.IsHome ? "bg-primary" : "bg-secondary")">
@@ -92,20 +105,26 @@
                             </span>
                         </td>
                         <td>@item.CreatedDate.ToString("dd.MM.yyyy")</td>
+                        
                         <td>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info"
-                               data-bs-toggle="tooltip" data-bs-placement="top" title="Detaylar">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a asp-action="Form" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"
-                               data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
-                                <i class="fas fa-pen-to-square"></i>
-                            </a>
-                            <button type="button" class="mt-1 btn btn-sm btn-outline-danger"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Sil"
-                                    onclick="confirmDelete(@item.Id, '@Html.Raw(item.Title.Replace("'", "\\'"))', 'Ürünü Sil')">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <div class="d-flex gap-1">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Detaylar">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a asp-action="Form" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Sil"
+                                        onclick="confirmDelete(@item.Id, '@Html.Raw(item.Title.Replace("'", "\\'"))', 'Ürünü Sil')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="bulk-check-col">
+                            <input type="checkbox" class="row-checkbox" value="@item.Id" />
                         </td>
                     </tr>
                 }
@@ -119,6 +138,10 @@
     <input type="hidden" name="id" id="deleteItemId" />
 </form>
 
+<form id="bulkDeleteForm" asp-action="BulkDelete" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
 @section Scripts {
     <script>
         $('#importBtn').on('click', function () {
@@ -129,5 +152,6 @@
                 optionalFields: ['aciklama', 'urun_kodu', 'fiyat', 'stok', 'kategori', 'marka', 'durum', 'anasayfa']
             });
         });
+        initBulkDelete('ürün');
     </script>
 }

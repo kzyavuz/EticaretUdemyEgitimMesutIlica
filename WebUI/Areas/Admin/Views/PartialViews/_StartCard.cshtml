@@ -1,0 +1,25 @@
+﻿@model IEnumerable<StartCardModel>
+
+<div class="row g-3 mb-4">
+
+    @foreach (var item in Model)
+    {
+        <div class="col-6 col-xl-3">
+            <div class="stat-card @item.Class" data-bs-toggle="tooltip"
+                 data-bs-placement="top" title="@item.Tooltip">
+                <div class="stat-card-content">
+                    <div>
+                        <div class="stat-label">@item.Title</div>
+                        <div class="stat-value">
+                            @item.Value
+                        </div>
+                    </div>
+                    <div class="stat-icon @item.Class">
+                        <i class="@item.Icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

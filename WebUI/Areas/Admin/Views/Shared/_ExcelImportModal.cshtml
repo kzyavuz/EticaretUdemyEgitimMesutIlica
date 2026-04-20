@@ -23,7 +23,7 @@
 
                 <!-- Drag-drop zone -->
                 <div id="excelDropZone"
-                     class="border border-2 rounded-3 p-4 text-center"
+                     class="border-2 rounded-3 p-4 text-center"
                      style="border-style:dashed!important;border-color:#ced4da;cursor:pointer;transition:all .2s;"
                      onclick="document.getElementById('excelFileInputHidden').click()">
                     <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2 d-block"></i>
@@ -37,7 +37,7 @@
                     <div class="d-flex align-items-center gap-2 p-2 rounded-2"
                          style="background:#f0fdf4;border:1px solid #86efac;">
                         <i class="fas fa-file-excel text-success"></i>
-                        <span id="excelFileName" class="small fw-semibold text-success flex-grow-1"></span>
+                        <span id="excelFileName" class="small fw-semibold text-success grow"></span>
                         <button type="button" id="excelClearFile" class="btn-close" style="font-size:.6rem;"></button>
                     </div>
                 </div>
@@ -198,6 +198,29 @@
     // ========== Progress Modal Logic ==========
 
     var progressConnection;
+    var _importHasError = false;   // global flag — var hoisting sorununu önler
+
+    // Bootstrap'ın CSS açılış animasyonu bitmeden hide() çağrılırsa çalışmaz.
+    // Bu fonksiyon önce BS API'yi dener, 400ms sonra zorla DOM temizliği yapar.
+    function _hideProgressModal() {
+        var el = document.getElementById('importModal');
+        if (!el) return;
+        var m = bootstrap.Modal.getInstance(el);
+        if (m) { try { m.hide(); } catch (e) {} }
+
+        // Zorla temizlik — animasyon süresi (300ms) geçtikten sonra hâlâ açıksa kapat
+        setTimeout(function () {
+            el.classList.remove('show', 'showing');
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+            el.removeAttribute('aria-modal');
+            el.removeAttribute('role');
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+            document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
+        }, 400);
+    }
 
     function initializeImportModal() {
         if (progressConnection && progressConnection.state === signalR.HubConnectionState.Connected) {
@@ -216,24 +239,25 @@
         });
 
         progressConnection.on("ReceiveComplete", function (data) {
+            if (_importHasError) return;
             $('#progressPercent').text('100%');
             $('#progressBar').css('width', '100%').removeClass('progress-bar-animated');
             var msg = '✓ <strong>' + data.SuccessCount + ' kayıt başarıyla eklendi!</strong>';
             if (data.TotalErrors > 0) {
-                msg += '<br/><span class="text-danger">⚠ ' + data.TotalErrors + ' hata oluştu</span>';
+                msg += '<br/><span class="text-danger">&#9888; ' + data.TotalErrors + ' hata oluştu</span>';
             }
             $('#statusItem').append('<div class="mt-2">' + msg + '</div>');
             setTimeout(function () {
-                var m = bootstrap.Modal.getInstance(document.getElementById('importModal'));
-                if (m) m.hide();
+                _hideProgressModal();
                 setTimeout(function () { location.reload(); }, 1000);
             }, 2000);
         });
 
         progressConnection.on("ReceiveError", function (errorMsg) {
+            if (_importHasError) return;
+            _importHasError = true;
+            _hideProgressModal();
             Swal.fire('Hata', errorMsg, 'error');
-            var m = bootstrap.Modal.getInstance(document.getElementById('importModal'));
-            if (m) m.hide();
         });
 
         progressConnection.start().catch(function (err) {
@@ -243,8 +267,9 @@
 
     function _startExcelImportWithData(formData, actionUrl) {
         initializeImportModal();
+        _importHasError = false;
 
-        var modal = new bootstrap.Modal(document.getElementById('importModal'));
+        var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importModal'));
         modal.show();
 
         $('#progressPercent').text('0%');
@@ -259,12 +284,42 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log("Import başlatıldı:", response);
+                var hasError = !response.success ||
+                    (response.errors && response.errors.length > 0 &&
+                     response.successCount === 0 && response.updateCount === 0);
+
+                if (hasError) {
+                    _importHasError = true;
+                    _hideProgressModal();
+                    var errorMsg = (response.errors && response.errors.length)
+                        ? response.errors.join('<br>')
+                        : 'İçeri aktarım başarısız oldu.';
+                    Swal.fire({ title: 'Hata', html: errorMsg, icon: 'error' });
+                    return;
+                }
+
+                // Başarılı — SignalR olmayan metodlar için progress tamamla
+                $('#progressPercent').text('100%');
+                $('#progressText').text('Tamamlandı');
+                $('#progressBar').css('width', '100%').removeClass('progress-bar-animated');
+
+                var msg = '<div class="text-success">&#10003; <strong>' + response.successCount + ' kayıt eklendi';
+                if (response.updateCount > 0) msg += ', ' + response.updateCount + ' kayıt güncellendi';
+                msg += '</strong></div>';
+                if (response.errors && response.errors.length > 0) {
+                    msg += '<div class="text-danger mt-1">&#9888; ' + response.errors.length + ' uyarı:<br>' + response.errors.join('<br>') + '</div>';
+                }
+                $('#statusItem').html(msg);
+
+                setTimeout(function () {
+                    _hideProgressModal();
+                    setTimeout(function () { location.reload(); }, 500);
+                }, 2000);
             },
             error: function (xhr, status, error) {
+                _importHasError = true;
+                _hideProgressModal();
                 Swal.fire('Hata', 'Import sırasında hata oluştu: ' + error, 'error');
-                var m = bootstrap.Modal.getInstance(document.getElementById('importModal'));
-                if (m) m.hide();
             }
         });
     }

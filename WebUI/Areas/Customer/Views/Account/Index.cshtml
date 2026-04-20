@@ -1,0 +1,212 @@
+﻿@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profilim";
+    Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
+    string? imageSrc = ResolveImageSrc(Model.EditProfileViewModel.ProfilImage);
+}
+
+<!-- Breadcrumb -->
+<nav class="cust-breadcrumb" aria-label="Konum yolu">
+    <a asp-controller="Dashboard" asp-action="Index">Panel</a>
+    <span class="sep"><i class="fa fa-chevron-right fa-xs" aria-hidden="true"></i></span>
+    <span class="current">@ViewData["Title"]</span>
+</nav>
+
+<!-- Sayfa başlığı -->
+<div class="cust-page-header cust-page-header-row">
+    <div>
+        <h1>Profil Bilgileri</h1>
+        <p>Kişisel bilgilerinizi ve şifrenizi buradan güncelleyebilirsiniz.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+
+        <!-- Profil güncelleme formu -->
+        <div class="cust-card">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-large" aria-hidden="true">
+                    <img src="@imageSrc" alt="Profile Avatar" />
+                </div>
+                <div class="profile-avatar-info">
+                    <h3>@Model.EditProfileViewModel.FirstName @Model.EditProfileViewModel.LastName</h3>
+                    <p>@Model.EditProfileViewModel.Email</p>
+                </div>
+            </div>
+
+            <div class="cust-card-header">
+                <h2 class="cust-card-title">
+                    <i class="fa fa-user-pen" aria-hidden="true"></i>
+                    Kişisel Bilgiler
+                </h2>
+            </div>
+            <div class="cust-card-body">
+                <form asp-action="UpdateProfile" method="POST">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row row-cols-1 row-cols-md-2">
+
+                        <div class="cust-form-group">
+                            <label asp-for="EditProfileViewModel.FirstName"></label>
+                            <input asp-for="EditProfileViewModel.FirstName" class="cust-input" />
+                            <span asp-validation-for="EditProfileViewModel.FirstName" class="text-danger"></span>
+                        </div>
+
+                        <div class="cust-form-group">
+                            <label asp-for="EditProfileViewModel.LastName"></label>
+                            <input asp-for="EditProfileViewModel.LastName" class="cust-input" />
+                            <span asp-validation-for="EditProfileViewModel.LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="cust-form-group">
+                            <label asp-for="EditProfileViewModel.Email"></label>
+                            <input asp-for="EditProfileViewModel.Email" class="cust-input" />
+                            <span asp-validation-for="EditProfileViewModel.Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="cust-form-group">
+                            <label asp-for="EditProfileViewModel.Phone"></label>
+                            <input asp-for="EditProfileViewModel.Phone" class="cust-input" />
+                            <span asp-validation-for="EditProfileViewModel.Phone" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="cust-form-group">
+                            <div class="form-switch mb-3 d-flex align-items-center gap-3">
+                                <input asp-for="EditProfileViewModel.IsTwoFactor" class="form-check-input" type="checkbox" id="twoFactorSwitch" style="width: 2.5em; height: 1.3em;">
+                                <label class="form-check-label mb-0" for="twoFactorSwitch">
+                                    İki Aşamalı Doğrulama
+                                </label>
+                                <span asp-validation-for="EditProfileViewModel.IsTwoFactor" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-cust-primary">
+                        <i class="fa fa-floppy-disk" aria-hidden="true"></i>
+                        Değişiklikleri Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Şifre değiştirme -->
+        <div class="cust-card">
+            <div class="cust-card-header">
+                <h2 class="cust-card-title">
+                    <i class="fa fa-key" aria-hidden="true"></i>
+                    Şifre Değiştir
+                </h2>
+            </div>
+            <div class="cust-card-body">
+                <form method="POST" asp-action="ResetPassword" asp-controller="Account" asp-area="Customer">
+
+                    <div class="cust-form-group">
+                        <label asp-for="ChangePasswordViewModel.CurrentPassword"></label>
+                        <input type="password"
+                               asp-for="ChangePasswordViewModel.CurrentPassword"
+                               class="cust-input"
+                               placeholder="Mevcut şifreniz"
+                               autocomplete="current-password" />
+                        <span asp-validation-for="ChangePasswordViewModel.CurrentPassword" class="text-danger"></span>
+
+                    </div>
+                    
+                    <div class="row row-cols-1 row-cols-md-2">
+
+                        <div class="cust-form-group">
+                            <label asp-for="ChangePasswordViewModel.NewPassword"></label>
+                            <input type="password"
+                                   asp-for="ChangePasswordViewModel.NewPassword"
+                                   class="cust-input"
+                                   placeholder="En az 8 karakter"
+                                   autocomplete="new-password" />
+                            <span asp-validation-for="ChangePasswordViewModel.NewPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="cust-form-group">
+                            <label asp-for="ChangePasswordViewModel.ConfirmPassword"></label>
+                            <input type="password"
+                                   asp-for="ChangePasswordViewModel.ConfirmPassword"
+                                   class="cust-input"
+                                   placeholder="Şifreyi tekrar giriniz"
+                                   autocomplete="new-password" />
+                            <span asp-validation-for="ChangePasswordViewModel.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-cust-primary">
+                        <i class="fa fa-lock" aria-hidden="true"></i>
+                        Şifreyi Güncelle
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Sağ sütun — Hesap özeti -->
+    <div class="col-lg-4">
+        <div class="cust-card">
+            <div class="cust-card-header">
+                <h2 class="cust-card-title">
+                    <i class="fa fa-circle-info" aria-hidden="true"></i>
+                    Hesap Bilgileri
+                </h2>
+            </div>
+            <div class="cust-card-body" style="padding-top:6px;">
+                <div class="cust-info-item">
+                    <div class="ci-icon"><i class="fa fa-user" aria-hidden="true"></i></div>
+                    <div>
+                        <div class="ci-label">Ad Soyad</div>
+                        <div class="ci-value">@Model.EditProfileViewModel.FullName</div>
+                    </div>
+                </div>
+                <div class="cust-info-item">
+                    <div class="ci-icon"><i class="fa fa-envelope" aria-hidden="true"></i></div>
+                    <div>
+                        <div class="ci-label">E-posta</div>
+                        <div class="ci-value">@Model.EditProfileViewModel.Email</div>
+                    </div>
+                </div>
+                <div class="cust-info-item">
+                    <div class="ci-icon"><i class="fa fa-building" aria-hidden="true"></i></div>
+                    <div>
+                        <div class="ci-label">Kullanıcı Adı</div>
+                        <div class="ci-value">@Model.EditProfileViewModel.UserName</div>
+                    </div>
+                </div>
+                <div class="cust-info-item">
+                    <div class="ci-icon"><i class="fa fa-phone" aria-hidden="true"></i></div>
+                    <div>
+                        <div class="ci-label">Telefon</div>
+                        <div class="ci-value">@Model.EditProfileViewModel.Phone</div>
+                    </div>
+                </div>
+                <div class="cust-info-item">
+                    <div class="ci-icon"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                    <div>
+                        <div class="ci-label">Üyelik Tarihi</div>
+                        <div class="ci-value">@Model.EditProfileViewModel.CreatedDate.ToString("dd MMMM yyyy")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="cust-card-footer">
+                <span class="status-badge approved">
+                    <i class="fa fa-shield-halved fa-xs" aria-hidden="true"></i>
+                    Hesap Aktif
+                </span>
+                <a href="../auth/login.php?logout=1" class="btn-cust-outline btn-sm" style="color:#ef4444; border-color:rgba(239,68,68,0.3);">
+                    <i class="fa fa-right-from-bracket" aria-hidden="true"></i>
+                    Çıkış
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

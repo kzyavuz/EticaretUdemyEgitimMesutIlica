@@ -1,0 +1,78 @@
+﻿@model TwoFactorViewModel
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Dogrulama Kodu";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="auth-page">
+    <div class="auth-form-wrap">
+        <div class="card p-4">
+            
+            <div class="auth-panel-grid" aria-hidden="true"></div>
+            <div class="auth-panel-orb auth-panel-orb-1" aria-hidden="true"></div>
+            <div class="auth-panel-orb auth-panel-orb-2" aria-hidden="true"></div>
+            <!-- Kart başlığı -->
+            <div class="auth-card-header">
+                <div class="auth-card-icon">
+                    <i class="fa fa-right-to-bracket" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <h1>2 Adımlı Güvenlik</h1>
+                    <p>E-postana gelen 6 haneli kodla girisini dogrula.</p>
+                    <p>
+                        <i class="fa-solid fa-envelope-open-text"></i>
+
+                        E-posta dogrulamasi
+                        Kod 5 dakika icinde gecerlidir.
+                    </p>
+                </div>
+            </div>
+            
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+
+            <!-- Login Formu -->
+            <form class="auth-form" method="post" asp-controller="Auth" asp-action="TwoFactor" asp-area="">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="IsAdmin" />
+
+                <!-- E-posta -->
+                <div class="form-group">
+                    <label asp-for="Code"></label>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-envelope ii-icon" aria-hidden="true"></i>
+                        <input type="text"
+                               asp-for="Code"
+                               class="form-control"
+                               placeholder="6 haneli kod"
+                               autocomplete="one-time-code"
+                               autofocus />
+                        <span class="val"></span>
+                    </div>
+
+                    <span asp-validation-for="Code" class="text-danger small"></span>
+                </div>
+
+                <div class="g-recaptcha mb-3" data-sitekey="@Configuration["GoogleReCaptcha:SiteKey"]"></div>
+                <span class="text-danger" id="captchaError"></span>
+
+                <!-- Giriş Butonu -->
+                <button type="submit" class="btn-auth">
+                    Dogrula ve giris yap
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+}

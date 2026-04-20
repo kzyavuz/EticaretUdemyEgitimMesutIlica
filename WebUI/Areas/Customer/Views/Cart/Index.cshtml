@@ -1,0 +1,135 @@
+﻿@using Core.Dto
+@model Cart
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
+}
+
+
+<h2 class="mb-4">Alışveriş Sepetim</h2>
+
+
+<div id="cart-content"
+     class="@(Model.CardLines.Any() ? "" : "d-none")"
+     data-summary-url="@Url.Action("GetCartSummary", "Cart", new { area = "Customer" })">
+
+    <div class="row">
+
+        @Html.AntiForgeryToken()
+        <!-- Sepet Listesi -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Ürün</th>
+                                <th scope="col">Ürün Kodu</th>
+                                <th scope="col" class="text-center">Adet</th>
+                                <th scope="col">Birim Fiyat</th>
+                                <th scope="col">Toplam</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.CardLines)
+                            {
+                                var img = ResolveImageSrc(item.Product.Image);
+                                <tr>
+                                    <td>
+                                        <a asp-area="" asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.Id">
+                                            <div class="d-flex align-items-center">
+                                                <img src="@img" alt="@item.Product.Title"
+                                                     class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                                <div>
+                                                    <h6 class="mb-0">@item.Product.Title</h6>
+                                                    <small class="text-muted">@item.Product.Brand?.Name</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">@item.Product.ProductCode</span>
+                                    </td>
+                                    <td style="width: 150px;">
+                                        <div class="input-group input-group-sm">
+
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="changeQuantity(this, @item.Product.Id, -1)"
+                                                    data-edit-url="@Url.Action("UpdateQuantity", "Cart", new { area = "Customer" })">
+                                                -
+                                            </button>
+        
+                                            <input type="text" class="form-control text-center quantity-input" value="@item.Quantity" readonly>
+        
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="changeQuantity(this, @item.Product.Id, 1)"
+                                                    data-edit-url="@Url.Action("UpdateQuantity", "Cart", new { area = "Customer" })">
+                                                +
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                    <td>@item.Product.Price.ToString("C2")</td>
+                                    <td class="fw-bold">@item.TotalPrice.ToString("C2")</td>
+                                    <td class="text-end">
+                                                                       
+                                        <button type="button"
+                                                onclick="editToCart(this, @item.Product.Id)"
+                                                class="btn btn-sm btn-outline-danger"
+                                                aria-label="Sepetten Çıkar"
+                                                data-process-type="remove"
+                                                data-remove-url="@Url.Action("RemoveCart", "Cart", new { area = "Customer" })">
+                                            <i class="bi bi-trash"></i>
+                                            Sil
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            }
+                    
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Özet Paneli -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Sipariş Özeti</h5>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Ara Toplam</span>
+                        <span id="summary-subtotal">@Model.SubTotalPrice.ToString("C2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>KDV (%20)</span>
+                        <span id="summary-tax">@Model.TaxTotalPrice.ToString("C2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Kargo</span>
+                        <span class="text-success" id="summary-shipping">
+                            @(Model.TotalPrice > 1000 ? "Kargo Bedava" : "Kargo Ücreti: " + 100.ToString("C2"))
+                        </span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold fs-5">Toplam</span>
+                        <span id="summary-total" class="fw-bold fs-5 text-primary">@Model.TotalPrice.ToString("C2")</span>
+                    </div>
+                    <a asp-area="Customer" asp-controller="Checkout" asp-action="Index" class="btn btn-primary w-100 btn-lg">Alışverişi Tamamla</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-link w-100 mt-2 text-decoration-none text-muted">Alışverişe Devam Et</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="cart-empty" class="text-center text-muted py-4 @(Model.CardLines.Any() ? "d-none" : "")">
+    <i class="fa fa-shopping-cart fs-3"></i>
+    <p class="mt-2">Sepetiniz boş</p>
+</div>

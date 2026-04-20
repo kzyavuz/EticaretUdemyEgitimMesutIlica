@@ -1,0 +1,93 @@
+/* ======================================================
+   12. CONTACT
+====================================================== */
+.contact-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    height: 100%
+}
+
+.ci-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border)
+}
+
+.ci-item:last-of-type {
+    border-bottom: none
+}
+
+.ci-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 15px
+}
+
+.ci-lbl {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    margin-bottom: 3px
+}
+
+.ci-val {
+    font-size: var(--fs-sm);
+    color: var(--heading);
+    font-weight: 500;
+    line-height: 1.5
+}
+
+.frow {
+    margin-bottom: 18px
+}
+
+.flbl {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 7px
+}
+
+.finp {
+    width: 100%;
+    padding: 11px 15px;
+    background: var(--bg3);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--heading);
+    font-size: var(--fs-sm);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    appearance: none
+}
+
+.finp:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15)
+}
+
+.finp::placeholder {
+    color: var(--text-muted);
+    opacity: .7
+}
+
+.finp option {
+    background: var(--card-bg)
+}

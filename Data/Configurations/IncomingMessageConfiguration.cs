@@ -11,8 +11,7 @@ namespace Data.Configurations
     {
         public void Configure(EntityTypeBuilder<IncomingMessage> builder)
         {
-            builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
-            builder.Property(x => x.Surname).IsRequired().HasMaxLength(50);
+            builder.Property(x => x.FullName).IsRequired().HasMaxLength(150);
             builder.Property(x => x.Email).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Phone).HasMaxLength(20);
             builder.Property(x => x.Subject).IsRequired().HasMaxLength(100);

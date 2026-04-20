@@ -1,0 +1,227 @@
+@model SignUpViewModel
+
+@{
+    ViewData["Title"] = "Kayit Ol";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="auth-page">
+
+    <!-- ===== Sol Dekoratif Panel ===== -->
+    <div class="auth-panel">
+        <div class="auth-panel-grid" aria-hidden="true"></div>
+        <div class="auth-panel-orb auth-panel-orb-1" aria-hidden="true"></div>
+        <div class="auth-panel-orb auth-panel-orb-2" aria-hidden="true"></div>
+
+        <div class="auth-panel-content">
+            <div class="auth-panel-eyebrow">
+                <span class="dot" aria-hidden="true"></span>
+                Ücretsiz Kayıt
+            </div>
+            <h2>Müşteri Hesabı<br><em>Oluşturun</em></h2>
+            <p>
+                Askar Profil müşteri portalına katılın.
+                Sipariş takibi, özel fiyatlandırma ve öncelikli destek ayrıcalıklarından yararlanın.
+            </p>
+            <div class="auth-features">
+                <div class="auth-feature-item">
+                    <span class="fi-icon"><i class="fa fa-star" aria-hidden="true"></i></span>
+                    Özel fiyatlandırma ve indirimler
+                </div>
+                <div class="auth-feature-item">
+                    <span class="fi-icon"><i class="fa fa-truck" aria-hidden="true"></i></span>
+                    Gerçek zamanlı sipariş takibi
+                </div>
+                <div class="auth-feature-item">
+                    <span class="fi-icon"><i class="fa fa-clock-rotate-left" aria-hidden="true"></i></span>
+                    Sipariş geçmişi ve tekrar sipariş
+                </div>
+                <div class="auth-feature-item">
+                    <span class="fi-icon"><i class="fa fa-shield-halved" aria-hidden="true"></i></span>
+                    Güvenli ve şifreli hesap
+                </div>
+            </div>
+
+            <div class="auth-panel-bottom mt-4">
+                &copy; @DateTime.Now.Year Askar Profil A.Ş. Tüm hakları saklıdır.
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Sağ Form Alanı ===== -->
+    <div class="auth-form-wrap">
+        <div class="auth-card" style="max-width:480px;">
+
+            <div class="auth-card-header">
+                <div class="auth-card-icon">
+                    <i class="fa fa-user-plus" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <h1>Kayıt Ol</h1>
+                    <p>Birkaç saniyede müşteri hesabınızı oluşturun.</p>
+                </div>
+            </div>
+
+            <form class="auth-form" method="POST" asp-controller="Auth" asp-action="SignUp">
+                
+                @Html.AntiForgeryToken()
+
+                <!-- Ad - Soyad -->
+                <div class="auth-row-2">
+                    <div class="form-group">
+                        <div class="d-flex">
+                            <label asp-for="FirstName"></label><span style="color:#ef4444;">*</span>
+                        </div>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-user ii-icon" aria-hidden="true"></i>
+                            <input type="text"
+                                   asp-for="FirstName"
+                                   class="form-control"
+                                   autocomplete="given-name"
+                                   autofocus />
+                        </div>
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="d-flex">
+                            <label asp-for="LastName"></label><span style="color:#ef4444;">*</span>
+                        </div>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-user ii-icon" aria-hidden="true"></i>
+                            <input type="text"
+                                   asp-for="LastName"
+                                   class="form-control"
+                                   autocomplete="family-name" />
+                        </div>
+                                   
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                </div>
+                
+                <!-- Telefon + Şirket -->
+                <div class="auth-row-2">
+
+                    <div class="form-group">
+                        <label asp-for="UserName"></label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-user ii-icon" aria-hidden="true"></i>
+                            <input type="text"
+                                   asp-for="UserName"
+                                   class="form-control"
+                                   autocomplete="organization" />
+                        </div>
+
+                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Phone"></label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-phone ii-icon" aria-hidden="true"></i>
+                            <input type="tel"
+                                   asp-for="Phone"
+                                   class="form-control"
+                                   placeholder="+90 5xx xxx xx xx"
+                                   autocomplete="tel" />
+                        </div>
+
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+                    
+                </div>
+
+                <!-- E-posta -->
+                <div class="form-group">
+                    <div class="d-flex">
+                        <label asp-for="Email"></label><span style="color:#ef4444;">*</span>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-envelope ii-icon" aria-hidden="true"></i>
+                        <input type="email"
+                               asp-for="Email"
+                               class="form-control"
+                               placeholder="ornek@sirket.com"
+                               autocomplete="email" />
+                    </div>
+                               
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+
+                <!-- Şifre -->
+                <div class="form-group">
+                    <div class="d-flex">
+                        <label asp-for="Password"></label><span style="color:#ef4444;">*</span>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-lock ii-icon" aria-hidden="true"></i>
+                        <input type="password"
+                               asp-for="Password"
+                               class="form-control"
+                               placeholder="En az 6 karakter"
+                               autocomplete="new-password" />
+
+                        <button type="button" class="pw-toggle" id="pw1Toggle" aria-label="Şifreyi göster/gizle">
+                            <i class="fa fa-eye" id="pw1Icon" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                               
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                    <!-- Güç çubuğu -->
+                    <div class="pw-strength-bar">
+                        <div class="pw-strength-fill" id="pwStrengthFill"></div>
+                    </div>
+                    <div class="pw-strength-text" id="pwStrengthText"></div>
+                </div>
+
+                <!-- Şifre tekrar -->
+                <div class="form-group">
+                    <div class="d-flex">
+                        <label asp-for="ConfirmPassword"></label><span style="color:#ef4444;">*</span>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-lock ii-icon" aria-hidden="true"></i>
+                        <input type="password"
+                               asp-for="ConfirmPassword"
+                               class="form-control"
+                               placeholder="Şifrenizi tekrar giriniz"
+                               autocomplete="new-password" />
+
+                        <button type="button" class="pw-toggle" id="pw2Toggle" aria-label="Şifreyi göster/gizle">
+                            <i class="fa fa-eye" id="pw2Icon" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    <div id="pwMatchMsg" style="font-size:11px; margin-top:4px;"></div>
+                </div>
+
+                <!-- Kullanım koşulları -->
+                <div class="auth-check" style="align-items:flex-start; gap:10px; margin-bottom:18px;">
+                    <input type="checkbox" id="terms" name="terms" value="1" style="margin-top:2px;" required />
+                    <label for="terms" class="terms-text">
+                        <a href="../page/page.php?slug=kullanim-kosullari" target="_blank">Kullanım Koşullarını</a> ve
+                        <a href="../page/page.php?slug=gizlilik-politikasi" target="_blank">Gizlilik Politikasını</a>
+                        okudum ve kabul ediyorum.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fa fa-user-plus" aria-hidden="true"></i>
+                    Hesap Oluştur
+                </button>
+            </form>
+
+            <div class="auth-link-row">
+                Zaten hesabınız var mı?
+                <a asp-controller="Auth" asp-action="SignIn">Giriş Yapın</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

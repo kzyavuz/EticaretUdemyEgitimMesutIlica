@@ -1,0 +1,301 @@
+﻿@{
+    ViewData["Title"] = "Hakkımızda Sayfası";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/page/about.min.css" />
+}
+
+<partial name="~/Views/PartialViews/_PageHeader.cshtml" model='"Hakkımızda"' />
+
+<section class="page-hero">
+    <div class="page-hero-grid" aria-hidden="true"></div>
+    <div class="container">
+        <div class="page-hero-inner">
+            <div class="page-hero-eyebrow">
+                <i class="fa fa-building" aria-hidden="true"></i> Kurumsal
+            </div>
+            <h1 class="page-hero-title">Hakkımızda</h1>
+            <p class="page-hero-sub">
+                20+ yıllık deneyim, ISO sertifikalı kalite güvencesi ve güvenilir
+                Türk sanayii partneri.
+            </p>
+        </div>
+        <span class="page-hero-bg-num" aria-hidden="true">02</span>
+    </div>
+</section>
+
+<section class="sec bg-theme">
+    <div class="container">
+        <div class="row g-5 align-items-center mb-5">
+            <div class="col-lg-5">
+                <div class="about-img-wrap">
+                    <img src="../assets/images/abouts/77e99217-3f87-4045-8a01-737bd95e29f4.jpg"
+                         alt="Kozlow Ticaret üretim tesisi" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+                    <div class="about-badge" aria-hidden="true">
+                        <div class="about-badge-num">20+</div>
+                        <div class="about-badge-lbl">Yıllık Deneyim</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="sec-label">Kozlow Ticaret</div>
+                <h2 class="sec-title">Türk Sanayinin<br />Güvenilir Partneri</h2>
+                <p class="text-muted mb-18 lh-1-8">
+                    Ekibimiz ekstrüzyon ve enjeksiyon konusunda geniş bilgi ve
+                    uzmanlığa sahip deneyimli profesyonellerden oluşmaktadır.
+                </p>
+                <p class="text-muted lh-1-8">
+                    En son makine ve teknolojiyle donatılmış üretim tesislerimizde,
+                    TPE, PVC, Kauçuk ürünler hassasiyetle üretilir.
+                </p>
+            </div>
+        </div>
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="card-g p-28 border-l-3-primary">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div
+                            class="w-38px h-38px bg-primary rounded-sm d-flex align-items-center justify-content-center text-white fs-16px shrink-0">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="fs-xl m-0">Vizyonumuz</h3>
+                    </div>
+                    <p class="text-muted lh-1-75 fs-sm mb-3">
+                        Plastik ekstrüzyon sektöründe yenilikçi çözümler ve üstün
+                        kalite standartlarıyla global bir marka olmak.
+                    </p>
+                    <div class="gap-y">
+                        <span class="fs-sm text-muted">→ Sürdürülebilir büyüme</span>
+                        <span class="fs-sm text-muted">→ Teknolojik yenilikler</span>
+                        <span class="fs-sm text-muted">→ Global pazarda liderlik</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-g p-28 border-l-3-accent">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div
+                            class="w-38px h-38px bg-accent rounded-sm d-flex align-items-center justify-content-center text-white fs-16px shrink-0">
+                            <i class="fa fa-bullseye" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="fs-xl m-0">Misyonumuz</h3>
+                    </div>
+                    <p class="text-muted lh-1-75 fs-sm mb-3">
+                        Müşterilerimize yönelik yüksek kaliteli, yenilikçi ve çevre
+                        dostu plastik ekstrüzyon ürünleri geliştirmek.
+                    </p>
+                    <div class="gap-y">
+                        <span class="fs-sm text-muted">→ Müşteri memnuniyeti</span>
+                        <span class="fs-sm text-muted">→ Kalite odaklı üretim</span>
+                        <span class="fs-sm text-muted">→ Çevre dostu yaklaşım</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="sec-label">Tarihçemiz</div>
+                <h2 class="sec-title fs-2xl mb-4">Kuruluştan Bugüne</h2>
+                <ol class="timeline">
+                    <li class="tl-item">
+                        <div class="tl-dot" aria-hidden="true"></div>
+                        <time class="tl-year" datetime="2013">2013</time>
+                        <div class="tl-title">Kozlow Ticaret Açılış</div>
+                        <p class="tl-desc">
+                            Kozlow Ticaret'in kuruluşu ve ilk üretim tesisinin açılışı.
+                        </p>
+                    </li>
+                    <li class="tl-item">
+                        <div class="tl-dot" aria-hidden="true"></div>
+                        <time class="tl-year" datetime="2015">2015</time>
+                        <div class="tl-title">Ulusal Pazara Açılış</div>
+                        <p class="tl-desc">
+                            İhracat faaliyetlerinin başlaması ve uluslararası pazarlara
+                            açılım.
+                        </p>
+                    </li>
+                    <li class="tl-item">
+                        <div class="tl-dot" aria-hidden="true"></div>
+                        <time class="tl-year" datetime="2019">2019</time>
+                        <div class="tl-title">Kapasite Artışı</div>
+                        <p class="tl-desc">
+                            Yeni üretim tesisi ve kapasitenin iki katına çıkarılması.
+                        </p>
+                    </li>
+                    <li class="tl-item p-0">
+                        <div class="tl-dot" aria-hidden="true"></div>
+                        <time class="tl-year" datetime="2024">2024+</time>
+                        <div class="tl-title">Sürekli Büyüme</div>
+                        <p class="tl-desc">
+                            Yeni ürün hatları ve global pazarda genişleme faaliyetleri.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-lg-6">
+                <div class="sec-label">Sertifikalarımız</div>
+                <h2 class="sec-title fs-2xl mb-4">Kalite Belgelerimiz</h2>
+                <div class="d-none d-md-flex flex-column gap-3">
+                    <article class="cert-card">
+                        <div class="cert-ico">
+                            <i class="fa fa-certificate" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="cert-name">ISO 9001:2015</div>
+                            <div class="cert-sub">Kalite Yönetim Sistemi</div>
+                        </div>
+                    </article>
+                    <article class="cert-card">
+                        <div class="cert-ico bg-accent">
+                            <i class="fa fa-leaf" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="cert-name">ISO 14001</div>
+                            <div class="cert-sub">Çevre Yönetim Sistemi</div>
+                        </div>
+                    </article>
+                    <article class="cert-card">
+                        <div class="cert-ico">
+                            <i class="fa fa-hard-hat" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="cert-name">ISO 45001</div>
+                            <div class="cert-sub">İş Sağlığı ve Güvenliği</div>
+                        </div>
+                    </article>
+                    <article class="cert-card">
+                        <div class="cert-ico bg-accent">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <div class="cert-name">ISO 10002</div>
+                            <div class="cert-sub">Müşteri Memnuniyeti</div>
+                        </div>
+                    </article>
+                </div>
+                <div class="cert-swiper-container d-md-none">
+                    <div class="swiper cert-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="cert-card">
+                                    <div class="cert-ico">
+                                        <i class="fa fa-certificate" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        <div class="cert-name">ISO 9001:2015</div>
+                                        <div class="cert-sub">Kalite Yönetim Sistemi</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="cert-card">
+                                    <div class="cert-ico bg-accent">
+                                        <i class="fa fa-leaf" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        <div class="cert-name">ISO 14001</div>
+                                        <div class="cert-sub">Çevre Yönetim Sistemi</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="cert-card">
+                                    <div class="cert-ico">
+                                        <i class="fa fa-hard-hat" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        <div class="cert-name">ISO 45001</div>
+                                        <div class="cert-sub">İş Sağlığı ve Güvenliği</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="cert-card">
+                                    <div class="cert-ico bg-accent">
+                                        <i class="fa fa-star" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        <div class="cert-name">ISO 10002</div>
+                                        <div class="cert-sub">Müşteri Memnuniyeti</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="whyus-sec sec" aria-labelledby="whyus-heading">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <div class="sec-label justify-content-center">
+                Neden Biz?
+            </div>
+            <h2 class="sec-title" id="whyus-heading">
+                Neden Bizi<br />Tercih Etmelisiniz?
+            </h2>
+        </div>
+        <div class="cards-swiper-wrap">
+            <div class="swiper cards-swiper why-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="why-card">
+                            <div class="why-icon">
+                                <i class="fa fa-award" aria-hidden="true"></i>
+                            </div>
+                            <h4 class="why-title">Uzmanlık</h4>
+                            <p class="why-desc">
+                                Deneyimli profesyonellerden oluşan ekibimizle plastik
+                                ekstrüzyon konusunda geniş bilgi sunuyoruz.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="why-card">
+                            <div class="why-icon">
+                                <i class="fa fa-robot" aria-hidden="true"></i>
+                            </div>
+                            <h4 class="why-title">Teknoloji</h4>
+                            <p class="why-desc">
+                                En son makine ve teknolojilerle donatılmış üretim
+                                tesislerimizde yenilikçi çözümler üretiyoruz.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="why-card">
+                            <div class="why-icon">
+                                <i class="fa fa-headset" aria-hidden="true"></i>
+                            </div>
+                            <h4 class="why-title">Müşteri Desteği</h4>
+                            <p class="why-desc">
+                                Satış öncesi ve sonrası teknik destek ile müşterilerimizin
+                                yanında yer alıyoruz.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="why-card">
+                            <div class="why-icon">
+                                <i class="fa fa-shield-halved" aria-hidden="true"></i>
+                            </div>
+                            <h4 class="why-title">Kalite</h4>
+                            <p class="why-desc">
+                                Endüstri standartlarında üretim ve sürekli kalite kontrol
+                                ile en yüksek kaliteli ürünleri sunuyoruz.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </div>
+</section>

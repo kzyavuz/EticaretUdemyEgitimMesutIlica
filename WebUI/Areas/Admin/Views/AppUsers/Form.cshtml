@@ -59,7 +59,7 @@
                         <label asp-for="UserName" class="form-label fw-medium small"></label>
                         <span class="text-danger">*</span>
                         <input asp-for="UserName" class="form-control" placeholder="kullanici_adi" />
-                            
+
                         <span asp-validation-for="UserName" class="invalid-feedback"></span>
                     </div>
 
@@ -67,115 +67,121 @@
                         <label asp-for="Email" class="form-label fw-medium small"></label>
                         <span class="text-danger">*</span>
                         <input asp-for="Email" type="email" class="form-control" placeholder="ornek@mail.com" />
-                            
+
                         <span asp-validation-for="Email" class="invalid-feedback"></span>
                     </div>
 
                     @if (!isEdit)
                     {
                         <div class="mb-3">
-                            <label for="password" class="form-label fw-medium small">Şifre <span
-                                class="text-danger">*</span></label>
-                                <input type="password" id="password" name="password" class="form-control"
-                                       placeholder="••••••••" />
-                                <small class="text-muted">En az 8 karakter, büyük/küçük harf, rakam ve özel karakter
-                                    içermelidir.</small>
-                                </div>
-                            }
-
-                            <div>
-                                <label asp-for="PhoneNumber" class="form-label fw-medium small"></label>
-                                <input asp-for="PhoneNumber" class="form-control" placeholder="05xx xxx xx xx" />
-                                <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
-                            </div>
+                            <label for="password" class="form-label fw-medium small">
+                                Şifre <span class="text-danger">*</span>
+                            </label>
+                            <input type="password" id="password" name="password" class="form-control"
+                                   placeholder="••••••••" />
+                            <small class="text-muted">
+                                En az 8 karakter, büyük/küçük harf, rakam ve özel karakter
+                                içermelidir.
+                            </small>
                         </div>
+                    }
+
+                    <div>
+                        <label asp-for="PhoneNumber" class="form-label fw-medium small"></label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="05xx xxx xx xx" />
+                        <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="col-lg-6 d-flex flex-column gap-3">
+        <div class="col-lg-6 d-flex flex-column gap-3">
 
-                    <div class="card border flex-grow-1">
-                        <div class="card-body p-4">
-                            @await Html.PartialAsync("_ImageUploadWidget", new ImageUploadWidgetViewModel
+            <div class="card border flex-grow-1">
+                <div class="card-body p-4">
+                    @await Html.PartialAsync("_ImageUploadWidget", new ImageUploadWidgetViewModel
+                    {
+                        Label = "Profil Fotoğrafı",
+                                        FieldName = "Image",
+                                        CurrentValue = Model?.Image,
+                                        IsEdit = isEdit
+                                        })
+                </div>
+            </div>
+
+            <div class="card border">
+                <div class="card-body p-4">
+                    <p class="text-uppercase text-muted fw-semibold small mb-3">Durum</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div id="toggleSwitch"
+                             class="bg-success bg-opacity-25 border border-success rounded-pill position-relative flex-shrink-0 status-toggle-button"
+                             role="button">
+                            <div data-toggle-thumb class="shadow-sm toggle-thumb status-toggle-button-circle"></div>
+                        </div>
+                        <div>
+                            <p id="toggleLabel" class="mb-0 small fw-semibold">Aktif</p>
+                            <p id="toggleSub" class="mb-0 text-muted small">Kullanıcı sisteme giriş yapabilir</p>
+                        </div>
+                    </div>
+                    <input type="checkbox" asp-for="IsActive" id="isActiveCheckbox" class="d-none" />
+                </div>
+            </div>
+
+            <div class="card border">
+                <div class="card-body p-4">
+                    <p class="text-uppercase text-muted fw-semibold small mb-3">
+                        Roller <span class="text-danger">*</span>
+                    </p>
+                    <select class="form-select" name="roleIds" multiple size="5">
+                        @foreach (var role in roles)
+                        {
+                            if (userRoles.Contains(role.Name ?? ""))
                             {
-                                Label = "Profil Fotoğrafı",
-                                FieldName = "Image",
-                                CurrentValue = Model?.Image,
-                                IsEdit = isEdit
-                            })
-                        </div>
-                    </div>
+                                <option value="@role.Id" selected>@role.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@role.Id">@role.Name</option>
+                            }
+                        }
+                    </select>
+                    <small class="text-muted mt-1 d-block">
+                        Ctrl tuşunu basılı tutarak birden fazla rol
+                        seçebilirsiniz.
+                    </small>
+                </div>
+            </div>
 
-                    <div class="card border">
-                        <div class="card-body p-4">
-                            <p class="text-uppercase text-muted fw-semibold small mb-3">Durum</p>
-                            <div class="d-flex align-items-center gap-3">
-                                <div id="toggleSwitch"
-                                     class="bg-success bg-opacity-25 border border-success rounded-pill position-relative flex-shrink-0 status-toggle-button"
-                                     role="button">
-                                    <div data-toggle-thumb class="shadow-sm toggle-thumb status-toggle-button-circle"></div>
-                                </div>
-                                <div>
-                                    <p id="toggleLabel" class="mb-0 small fw-semibold">Aktif</p>
-                                    <p id="toggleSub" class="mb-0 text-muted small">Kullanıcı sisteme giriş yapabilir</p>
-                                </div>
-                            </div>
-                            <input type="checkbox" asp-for="IsActive" id="isActiveCheckbox" class="d-none" />
-                        </div>
-                    </div>
+        </div>
+    </div>
 
-                    <div class="card border">
-                        <div class="card-body p-4">
-                            <p class="text-uppercase text-muted fw-semibold small mb-3">Roller <span
-                                class="text-danger">*</span></p>
-                                <select class="form-select" name="roleIds" multiple size="5">
-                                    @foreach (var role in roles)
-                                    {
-                                        if (userRoles.Contains(role.Name ?? ""))
-                                        {
-                                            <option value="@role.Id" selected>@role.Name</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@role.Id">@role.Name</option>
-                                        }
-                                    }
-                                </select>
-                                <small class="text-muted mt-1 d-block">Ctrl tuşunu basılı tutarak birden fazla rol
-                                    seçebilirsiniz.</small>
-                                </div>
-                            </div>
+    <div class="d-flex justify-content-end gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+        <button type="submit"
+                class="btn @(isEdit ? "btn-outline-success" : "btn-outline-primary") d-flex align-items-center gap-2 fw-semibold">
+            <i class="fas fa-circle-check"></i>
+            @(isEdit ? "Kaydet" : "Ekle")
+        </button>
+    </div>
 
-                        </div>
-                    </div>
+</form>
 
-                    <div class="d-flex justify-content-end gap-2">
-                        <a asp-action="Index" class="btn btn-outline-secondary d-flex align-items-center gap-2">
-                            <i class="fas fa-arrow-left"></i> Geri Dön
-                        </a>
-                        <button type="submit"
-                                class="btn @(isEdit ? "btn-outline-success" : "btn-outline-primary") d-flex align-items-center gap-2 fw-semibold">
-                            <i class="fas fa-circle-check"></i>
-                            @(isEdit ? "Kaydet" : "Ekle")
-                        </button>
-                    </div>
-
-                </form>
-
-                @section Scripts {
-                    @{
-                        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-                    }
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            FormUtils.ToggleSwitch.init('toggleSwitch', 'isActiveCheckbox', @(Model?.IsActive.ToString().ToLower() ?? "true"), {
-                                labelId: 'toggleLabel',
-                                subId: 'toggleSub',
-                                activeLabel: 'Aktif',
-                                inactiveLabel: 'Pasif',
-                                activeSub: 'Kullanıcı sisteme giriş yapabilir',
-                                inactiveSub: 'Kullanıcı sisteme giriş yapamaz',
-                            });
-                        });
-                    </script>
-                }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            FormUtils.ToggleSwitch.init('toggleSwitch', 'isActiveCheckbox', @(Model?.IsActive.ToString().ToLower() ?? "true"), {
+                labelId: 'toggleLabel',
+                subId: 'toggleSub',
+                activeLabel: 'Aktif',
+                inactiveLabel: 'Pasif',
+                activeSub: 'Kullanıcı sisteme giriş yapabilir',
+                inactiveSub: 'Kullanıcı sisteme giriş yapamaz',
+            });
+        });
+    </script>
+}

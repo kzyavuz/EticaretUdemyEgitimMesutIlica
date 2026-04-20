@@ -1,0 +1,11 @@
+<div id="cartPanel" class="cart-panel">
+    <div class="cart-panel-header">
+        <span>Sepetim</span>
+        <button type="button" class="close-cart-panel" onclick="toggleCartPanel()">&times;</button>
+    </div>
+    <div class="cart-panel-body" id="cartPanelBody">
+        @* Burada sepet ürünleri dinamik olarak yüklenecek *@
+        <div class="cart-loading">Yükleniyor...</div>
+    </div>
+</div>
+<div id="cartScrim" class="cart-scrim" onclick="toggleCartPanel()"></div>

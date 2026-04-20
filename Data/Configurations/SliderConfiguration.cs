@@ -14,7 +14,7 @@ namespace Data.Configurations
             builder.Property(x => x.Title).IsRequired().HasMaxLength(250);
             builder.Property(x => x.Description).HasMaxLength(1000);
             builder.Property(x => x.Image).HasMaxLength(100);
-            builder.Property(x => x.Link).HasMaxLength(100);
+            builder.Property(x => x.Slug).HasMaxLength(100);
         }
     }
 }

@@ -1,0 +1,156 @@
+﻿@model CategoryMenuViewModel
+
+<li class="has-mega">
+    <span class="custom-a">
+        <i class="fa fa-grid-2 fa-xs" aria-hidden="true"></i>
+        Kategoriler
+        <i class="fa fa-chevron-down chev" aria-hidden="true"></i>
+    </span>
+
+    <div class="nav-mega cat-mega" role="menu" aria-label="Ürün Kategorileri">
+        <div class="cat-mega-inner">
+
+            <!-- Sol kenar çubuğu: ana kategoriler -->
+            <aside class="cat-sidebar">
+                <ul class="cat-sidebar-list" role="list">
+                    @{
+                        int firstCatId = Model?.MainCategories?.FirstOrDefault()?.Id ?? 0;
+                    }
+                    @foreach (var cat in Model?.MainCategories ?? Enumerable.Empty<Category>())
+                    {
+                        bool hasChildren = Model?.SubCategories?.Any(c => c.ParentId == cat.Id) ?? false;
+
+                        <li class="cat-sidebar-item @(cat.Id == firstCatId ? "is-active" : "")"
+                            data-cat-id="@cat.Id"
+                            role="listitem">
+
+                            <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@cat.Id"
+                               class="cat-sidebar-link"
+                               role="menuitem">
+                                @if (!string.IsNullOrEmpty(cat.Image))
+                                {
+                                    <img src="@cat.Image" class="cat-sidebar-img" alt="@cat.Title" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="cat-sidebar-icon" aria-hidden="true">
+                                        <i class="fa fa-tag"></i>
+                                    </span>
+                                }
+                                <span class="cat-sidebar-text">@cat.Title</span>
+                                @{
+                                    int catProductCount = Model?.ProductCounts?.GetValueOrDefault(cat.Id, 0) ?? 0;
+                                }
+                                @if (catProductCount > 0)
+                                {
+                                    <span class="cat-sidebar-count">@catProductCount</span>
+                                }
+                                @if (hasChildren)
+                                {
+                                    <i class="fa fa-chevron-right cat-chev" aria-hidden="true"></i>
+                                }
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </aside>
+
+            <!-- Sağ içerik: her ana kategorinin alt kategorileri -->
+            <div class="cat-content">
+                @{
+                    bool isFirstPanel = true;
+                }
+                @foreach (var cat in Model?.MainCategories ?? Enumerable.Empty<Category>())
+                {
+                    var children = Model?.SubCategories?
+                    .Where(c => c.ParentId == cat.Id)
+                    .OrderBy(c => c.OrderNumber)
+                    .ToList() ?? new List<Category>();
+
+                    <div class="cat-sub-panel @(isFirstPanel ? "is-active" : "")"
+                         data-parent-id="@cat.Id">
+
+                        @if (children.Any())
+                        {
+                            <div class="cat-sub-header">
+                                <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@cat.Id"
+                                   class="cat-sub-title">
+                                    @cat.Title
+                                    <i class="fa fa-arrow-right fa-xs" aria-hidden="true"></i>
+                                </a>
+                                <span class="cat-sub-count">@children.Count alt kategori</span>
+                            </div>
+                            <div class="cat-sub-grid">
+                                @foreach (var sub in children)
+                                {
+                                    string? subImageSrc = ResolveImageSrc(sub.Image);
+                                    int subCount = Model?.ProductCounts?.GetValueOrDefault(sub.Id, 0) ?? 0;
+
+                                    var grandchildren = Model?.SubSubCategories?
+                                        .Where(c => c.ParentId == sub.Id)
+                                        .OrderBy(c => c.OrderNumber)
+                                        .ToList() ?? new List<Category>();
+
+                                    <div class="cat-l2-group">
+                                        <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@sub.Id"
+                                           class="cat-l2-header" role="menuitem">
+                                            @if (!string.IsNullOrEmpty(sub.Image))
+                                            {
+                                                <img src="@subImageSrc" class="cat-l2-img" alt="@sub.Title" loading="lazy" />
+                                            }
+                                            else
+                                            {
+                                                <span class="cat-l2-icon" aria-hidden="true"><i class="fa fa-tag"></i></span>
+                                            }
+                                            <span class="cat-l2-name">@sub.Title</span>
+                                            @if (subCount > 0)
+                                            {
+                                                <span class="mega-item-count">@subCount</span>
+                                            }
+                                        </a>
+
+                                        @if (grandchildren.Any())
+                                        {
+                                            <ul class="cat-l3-list" role="list">
+                                                @foreach (var gc in grandchildren)
+                                                {
+                                                    int gcCount = Model?.ProductCounts?.GetValueOrDefault(gc.Id, 0) ?? 0;
+                                                    <li class="cat-l3-item" role="listitem">
+                                                        <a asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@gc.Id"
+                                                           role="menuitem">
+                                                            <i class="fa fa-chevron-right fa-2xs" aria-hidden="true"></i>
+                                                            @gc.Title
+                                                            @if (gcCount > 0)
+                                                            {
+                                                                <span class="cat-l3-count">@gcCount</span>
+                                                            }
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="cat-no-sub">
+                                <i class="fa fa-folder-open fa-2x" aria-hidden="true"></i>
+                                <p>Bu kategoride henüz alt kategori bulunmuyor.</p>
+                                <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@cat.Id"
+                                   class="cat-view-all">
+                                    Tüm @cat.Title Ürünleri
+                                    <i class="fa fa-arrow-right fa-xs" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    isFirstPanel = false;
+                }
+            </div>
+
+        </div>
+    </div>
+</li>

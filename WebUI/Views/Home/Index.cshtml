@@ -1,5 +1,261 @@
-﻿@{
+﻿@model HomeViewModel
+
+@{
     ViewData["Title"] = "Anasayfa";
     Layout = "_Layout";
 }
-<h1>Merhaba</h1>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/page/home.min.css" />
+}
+
+<section class="hero" aria-label="Ana Sayfa Hero Bölümü">
+    <div class="hero-noise" aria-hidden="true"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+    <div class="custom-wrap w-full">
+        <div class="hero-inner">
+            <div>
+                <div class="hero-badge badge-pill mb-22">
+                    <span class="dot" aria-hidden="true"></span> 20+ Yıllık
+                    Endüstriyel Uzmanlık
+                </div>
+                <h1 class="hero-title">Plastik <em>Ekstrüzyon</em> Uzmanları</h1>
+                <p class="hero-desc">
+                    TPE, PVC ve Kauçuk profil çözümleri. Otomotivden inşaata,
+                    sanayiden elektroniğe kadar yüksek kaliteli fitil ve profil
+                    üretimi.
+                </p>
+                <div class="hero-ctas">
+                    <a href="product.php" class="btn-p">
+                        <i class="fa fa-boxes-stacked" aria-hidden="true"></i>
+                        Ürünleri Keşfet
+                    </a>
+                    <a href="offer.php" class="btn-o"><i class="fa fa-phone" aria-hidden="true"></i> Teklif Al</a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-swiper-wrap">
+                    <div class="swiper hero-swiper" aria-label="Ürün Görselleri">
+                        <div class="swiper-wrapper">
+                            @if (Model.Sliders == null || !Model.Sliders.Any())
+                            {
+                                <div class="swiper-slide">
+                                    <figure class="m-0 relative w-full h-full">
+                                        <img src="~/img/default-image.webp"
+                                             alt="Default Slider Başlığı"
+                                             width="600"
+                                             height="420"
+                                             loading="eager"
+                                             decoding="async"
+                                             referrerpolicy="no-referrer" />
+                                        <figcaption class="hero-slide-caption">
+                                            <h2 class="fs-lg text-white m-0">
+                                                Default Slider Başlığı
+                                            </h2>
+                                            <p>
+                                                Default slider açıklaması. Lütfen yönetici panelinden slider ekleyin.
+                                            </p>
+                                        </figcaption>
+                                    </figure>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (Slider slider in Model.Sliders)
+                                {
+                                    <div class="swiper-slide">
+                                        <figure class="m-0 relative w-full h-full">
+                                            <a href="@slider.Slug" target="_blank" aria-label="@slider.Title" data-bs-toggle="tooltip" data-bs-placement="top" title="Slider bağlantısını yeni sekmede aç">
+                                                <img src="@slider.Image"
+                                                    alt="@slider.Title"
+                                                    width="600"
+                                                    height="420"
+                                                    loading="eager"
+                                                    decoding="async"
+                                                    referrerpolicy="no-referrer" />
+                                            </a>
+                                            <figcaption class="hero-slide-caption">
+                                                <h2 class="fs-lg text-white m-0">
+                                                    @slider.Title
+                                                </h2>
+                                                <p>
+                                                    @slider.Description
+                                                </p>
+                                            </figcaption>
+                                        </figure>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ── MARQUEE / KAYAN STATS ŞERİDİ ── -->
+        <div class="hero-ticker-wrap" aria-label="Şirket İstatistikleri">
+            <div class="hero-ticker" aria-hidden="true">
+                <!-- İlk set -->
+                <div class="ticker-track">
+                    <div class="ticker-item">
+                        <div class="ticker-num">20+</div>
+                        <div class="ticker-lbl">Yıllık<br />Deneyim</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">13+</div>
+                        <div class="ticker-lbl">Ürün<br />Grubu</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">4</div>
+                        <div class="ticker-lbl">ISO<br />Sertifikası</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">3</div>
+                        <div class="ticker-lbl">Dil<br />Desteği</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">500+</div>
+                        <div class="ticker-lbl">Mutlu<br />Müşteri</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">TPE</div>
+                        <div class="ticker-lbl">Malzeme<br />Uzmanlığı</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">PVC</div>
+                        <div class="ticker-lbl">Yüksek<br />Kalite</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">ISO</div>
+                        <div class="ticker-lbl">9001:2015<br />Sertifikalı</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                </div>
+                <!-- Kopyası — sonsuz döngü için -->
+                <div class="ticker-track" aria-hidden="true">
+                    <div class="ticker-item">
+                        <div class="ticker-num">20+</div>
+                        <div class="ticker-lbl">Yıllık<br />Deneyim</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">13+</div>
+                        <div class="ticker-lbl">Ürün<br />Grubu</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">4</div>
+                        <div class="ticker-lbl">ISO<br />Sertifikası</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">3</div>
+                        <div class="ticker-lbl">Dil<br />Desteği</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">500+</div>
+                        <div class="ticker-lbl">Mutlu<br />Müşteri</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">TPE</div>
+                        <div class="ticker-lbl">Malzeme<br />Uzmanlığı</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">PVC</div>
+                        <div class="ticker-lbl">Yüksek<br />Kalite</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                    <div class="ticker-item">
+                        <div class="ticker-num">ISO</div>
+                        <div class="ticker-lbl">9001:2015<br />Sertifikalı</div>
+                        <span class="ticker-sep">✦</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Ekran okuyucular için gizli anlamlı içerik -->
+            <ul class="sr-only">
+                <li>20+ Yıllık Deneyim</li>
+                <li>13+ Ürün Grubu</li>
+                <li>4 ISO Sertifikası</li>
+                <li>3 Dil Desteği</li>
+                <li>500+ Mutlu Müşteri</li>
+                <li>ISO 9001:2015 Sertifikalı</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="products-sec sec" aria-labelledby="products-heading-home">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
+            <div data-aos="fade-right">
+                <div class="sec-label">Ürünlerimiz</div>
+                <h2 class="sec-title m-0"
+                    id="products-heading-home">
+                    Yüksek Kaliteli<br />Ürün Çeşitlerimiz
+                </h2>
+            </div>
+            <a href="product.php"
+               class="btn-o"
+               data-aos="fade-left"><i class="fa fa-th-large" aria-hidden="true"></i> Tüm Ürünler</a>
+        </div>
+
+        @if (Model.Products == null || !Model.Products.Any())
+        {
+            <p class="text-center text-muted">Gösterilecek ürün bulunamadı.</p>
+        }
+        else
+        {
+            <div class="row g-2 g-md-3">
+
+                @Html.AntiForgeryToken()
+                @foreach (Product item in Model.Products)
+                {
+                    <div class="col-6 col-md-4 col-xl-3" data-aos="fade-up">
+                        @await Component.InvokeAsync("ProductCard", new { product = item })
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container">
+        <div class="cta-inner" data-aos="fade-up">
+            <div class="sec-label justify-content-center mb-14">
+                Hemen Başlayın
+            </div>
+            <h2 class="cta-title" id="cta-heading">
+                Projeleriniz için<br />Özel Çözümler
+            </h2>
+            <p class="cta-desc">
+                İhtiyaçlarınıza uygun plastik ekstrüzyon çözümleri için uzman
+                ekibimizle iletişime geçin.
+            </p>
+            <div class="cta-btns">
+                <a href="contact.php" class="btn-p">
+                    <i class="fa fa-envelope" aria-hidden="true"></i> İletişime
+                    Geçin
+                </a>
+                <a href="tel:+905531048108" class="btn-o">
+                    <i class="fa fa-phone" aria-hidden="true"></i> +90 553 104 81
+                    08
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

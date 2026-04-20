@@ -1,0 +1,101 @@
+/* ======================================================
+   DROPDOWN COMPONENT (Glassmorphism & Premium UI)
+   ====================================================== */
+.blog-sort-wrap {
+    position: relative;
+    margin-left: auto;
+}
+
+.blog-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--bg3);
+    border: 1.5px solid var(--border2);
+    border-radius: var(--r-full);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.blog-sort-btn:hover {
+    border-color: var(--primary);
+    color: var(--heading);
+    background: var(--bg2);
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.15);
+    transform: translateY(-1px);
+}
+
+.blog-sort-btn i {
+    font-size: 11px;
+    opacity: 0.7;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blog-sort-wrap.open .blog-sort-btn {
+    border-color: var(--primary);
+    background: var(--bg2);
+}
+
+.blog-sort-wrap.open .blog-sort-btn i:last-child {
+    transform: rotate(180deg);
+}
+
+
+.blog-sort-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    background: var(--card-bg);
+    border: 1px solid var(--border2);
+    border-radius: var(--r-md);
+    padding: 6px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity .2s, transform .2s, visibility .2s;
+    pointer-events: none;
+    z-index: 200;
+}
+
+.blog-sort-wrap.open .blog-sort-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.blog-sort-opt {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 11px;
+    font-size: var(--fs-sm);
+    color: var(--text);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.blog-sort-opt:hover {
+    background: rgba(var(--primary-rgb), .1);
+    color: var(--primary);
+}
+
+.blog-sort-opt.active {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.blog-sort-opt i {
+    color: var(--primary);
+    font-size: 11px;
+    width: 14px;
+}

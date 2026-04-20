@@ -5,16 +5,10 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     bool isEdit = Model?.Id > 0;
 }
-<div class="d-flex align-items-center gap-2 mb-4">
-    <div class="bg-primary bg-opacity-10 rounded p-2">
-        <i class="fas @(isEdit ? "fa-pen-to-square" : "fa-images") text-primary"></i>
-    </div>
-    <div>
-        <h4 class="mb-0 fw-semibold">@ViewData["Title"]</h4>
-        <small class="text-muted">
-            @(isEdit ? "Slider bilgilerini güncelleyin" : "Yeni slider bilgilerini aşağıya girin")
-        </small>
-    </div>
+
+@* breadcrumb ve butonlar *@
+<div class="page-header">
+    <partial name="~/Areas/Admin/Views/PartialViews/_Breadcrumb.cshtml" model="@ViewBag.Breadcrumbs" />
 </div>
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" method="post" enctype="multipart/form-data">
@@ -48,9 +42,9 @@
                     </div>
 
                     <div>
-                        <label asp-for="Link" class="form-label fw-medium small"></label>
-                        <input asp-for="Link" class="form-control" placeholder="https://example.com" />
-                        <span asp-validation-for="Link" class="invalid-feedback"></span>
+                        <label asp-for="Slug" class="form-label fw-medium small"></label>
+                        <input asp-for="Slug" class="form-control" placeholder="https://example.com" />
+                        <span asp-validation-for="Slug" class="invalid-feedback"></span>
                     </div>
                 </div>
             </div>
@@ -72,20 +66,17 @@
 
             <div class="card border flex-grow-1">
                 <div class="card-body p-4">
-                    <p class="text-uppercase text-muted fw-semibold small mb-3">Durum</p>
 
-                    <div class="d-flex align-items-center gap-3">
-                        <div id="toggleSwitch"
-                             class="bg-success bg-opacity-25 border border-success rounded-pill position-relative flex-shrink-0 status-toggle-button"
-                             role="button">
-                            <div data-toggle-thumb class="shadow-sm toggle-thumb status-toggle-button-circle"></div>
-                        </div>
-                        <div>
-                            <p id="toggleLabel" class="mb-0 small fw-semibold">Aktif</p>
-                            <p id="toggleSub" class="mb-0 text-muted small">Slider yayında görünür</p>
-                        </div>
+                    <div class="mb-3">
+                        <label asp-for="Status" class="form-label fw-medium small"></label>
+                        <span class="text-danger">*</span>
+                        <select asp-for="Status" class="form-select">
+                            <option value="1">Aktif</option>
+                            <option value="2">Pasif</option>
+                        </select>
+                        <span asp-validation-for="Status" class="invalid-feedback"></span>
                     </div>
-                    <input type="checkbox" asp-for="IsActive" id="isActiveCheckbox" class="d-none" />
+
                 </div>
             </div>
 
@@ -109,17 +100,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            FormUtils.ToggleSwitch.init('toggleSwitch', 'isActiveCheckbox', @(Model?.IsActive.ToString().ToLower() ?? "true"), {
-                labelId: 'toggleLabel',
-                subId: 'toggleSub',
-                activeLabel: 'Aktif',
-                inactiveLabel: 'Pasif',
-                activeSub: 'Slider yayında görünür',
-                inactiveSub: 'Slider yayında görünmez',
-            });
-        });
-    </script>
 }

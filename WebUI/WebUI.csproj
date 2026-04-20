@@ -29,7 +29,9 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Models\" />
+    <Folder Include="Areas\Customer\Data\" />
+    <Folder Include="wwwroot\img\brochure\" />
+    <Folder Include="wwwroot\img\team\" />
     <Folder Include="wwwroot\uploads\brands\" />
   </ItemGroup>
 

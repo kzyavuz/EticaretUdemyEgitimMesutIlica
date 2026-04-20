@@ -1,0 +1,32 @@
+<div class="search-overlay" id="searchOverlay" role="search">
+    <button class="search-close-btn" onclick="closeSearch()" aria-label="Aramayı Kapat">
+        <i class="fa fa-xmark" aria-hidden="true"></i>
+    </button>
+    <div class="search-box">
+        <div class="search-inp-wrap">
+            <i class="fa fa-search px-16 text-muted fs-16px" aria-hidden="true"></i>
+            <input class="search-inp" id="searchInp" type="search" placeholder="Ürün, kategori veya materyal ara..."
+                   autocomplete="off" aria-label="Arama" />
+            <div class="search-loading" id="searchLoading">
+                <i class="fa fa-spinner fa-spin"></i>
+            </div>
+            <button class="search-submit" id="searchSubmit">
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </button>
+        </div>
+        
+        <div class="search-results-container" id="searchResultsContainer">
+            <div class="search-results-grid" id="searchResults">
+                <!-- Canlı sonuçlar buraya gelecek -->
+            </div>
+            <div class="search-no-results" id="searchNoResults">
+                <i class="fa fa-magnifying-glass mb-3 opacity-20" style="font-size: 40px;"></i>
+                <p>Eşleşen bir sonuç bulunamadı.</p>
+            </div>
+        </div>
+
+        <p class="search-hint">
+            Aramak için <kbd>Enter</kbd> kapatmak için <kbd>Esc</kbd>
+        </p>
+    </div>
+</div>

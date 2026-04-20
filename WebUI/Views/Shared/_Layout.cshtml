@@ -1,32 +1,40 @@
 ﻿<!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark" data-radius="sharp" data-font="poppins">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EticaretUdemyEgitim</title>
-
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <partial name="~/Views/PartialViews/_Head.cshtml" />
+    @RenderSection("Styles", required: false)
 </head>
 
 <body>
 
-    <partial name="_Header" />
+    @await Component.InvokeAsync("Header")
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <!-- Sepet Butonu (sol sabit) -->
+    @if (await HasCartItemsAsync())
+    {
+        <button id="cartOpenBtn" class="cart-open-btn" onclick="toggleCartPanel()">
+            <i class="fas fa-shopping-cart"></i>
+        </button>
+    }
 
-    <partial name="_Footer" />
+    <partial name="~/Views/PartialViews/_CartPanel.cshtml" />
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <partial name="~/Views/PartialViews/_ThemeSettings.cshtml" />
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <partial name="~/Views/PartialViews/_SearchOverlay.cshtml" />
+
+    @await Component.InvokeAsync("Footer")
+
+    <partial name="~/Views/PartialViews/_Script.cshtml" />
+
+    @RenderSection("Scripts", required: false)
+
+    <partial name="~/Views/PartialViews/_Swal2.cshtml" />
 </body>
 
 </html>

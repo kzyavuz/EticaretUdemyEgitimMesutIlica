@@ -1,0 +1,23 @@
+<!-- SCRIPTS -->
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/lib/aos/aos.min.js"></script>
+<script src="~/lib/swipper/swiper-bundle.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/toastr/toastr.min.js"></script>
+<script src="~/lib/fancybox/fancybox.umd.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/ajax.js" asp-append-version="true"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof $.fn.fancybox !== "undefined") {
+            $("[data-fancybox]").fancybox({
+                loop: true,
+                buttons: ["zoom", "slideShow", "thumbs", "close"],
+                animationEffect: "zoom",
+                transitionEffect: "slide",
+            });
+        }
+    });
+</script>

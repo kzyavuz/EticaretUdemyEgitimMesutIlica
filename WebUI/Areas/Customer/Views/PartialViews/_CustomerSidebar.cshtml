@@ -1,0 +1,78 @@
+﻿<!-- ===== Sidebar Overlay (mobile) ===== -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ===== Sidebar ===== -->
+<aside class="cust-sidebar" id="custSidebar" aria-label="Müşteri Paneli Navigasyon">
+
+    <!-- Logo -->
+    <div class="cust-sidebar-header">
+        <a href="../page/home.php" class="cust-sidebar-logo" aria-label="Kozlow Ticaret Ana Sayfa">
+            <div class="cust-sidebar-logo-mark">K</div>
+            <span class="cust-sidebar-logo-text">Kozlow <span>Ticaret</span></span>
+        </a>
+    </div>
+
+    <!-- Navigasyon -->
+    <nav class="cust-nav" aria-label="Panel Menüsü">
+        <!-- Genel -->
+        <div class="cust-nav-section">
+            <div class="cust-nav-section-title">Genel</div>
+            <a asp-area="Customer" asp-controller="Dashboard" asp-action="Index" class="cust-nav-item">
+                <i class="fa fa-gauge-high nav-icon" aria-hidden="true"></i>
+                Gösterge Paneli
+            </a>
+        </div>
+
+        <!-- Siparişler & Teklifler -->
+        <div class="cust-nav-section">
+            <div class="cust-nav-section-title">İşlemler</div>
+            <a asp-area="Customer" asp-controller="Orders" asp-action="Index" class="cust-nav-item ">
+                <i class="fa fa-boxes-stacked nav-icon" aria-hidden="true"></i>
+                Siparişlerim
+                <span class="nav-badge">3</span>
+            </a>
+            <a asp-area="Customer" asp-controller="Offers" asp-action="Index" class="cust-nav-item">
+                <i class="fa fa-file-invoice nav-icon" aria-hidden="true"></i>
+                Tekliflerim
+                <span class="nav-badge orange">1</span>
+            </a>
+            <a asp-area="Customer" asp-controller="Documents" asp-action="Index" class="cust-nav-item">
+                <i class="fa fa-folder-open nav-icon" aria-hidden="true"></i>
+                Belgelerim
+            </a>
+            <a asp-area="Customer" asp-controller="Favorites" asp-action="Index" class="cust-nav-item">
+                <i class="fa fa-heart nav-icon" aria-hidden="true"></i>
+                Beğenilenler
+                <span class="nav-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.25);">6</span>
+            </a>
+        </div>
+
+        <!-- Hesap -->
+        <div class="cust-nav-section">
+            <div class="cust-nav-section-title">Hesap</div>
+            <a asp-area="Customer" asp-controller="Account" asp-action="Index" class="cust-nav-item <?php echo $active_page === 'profile' ? 'active' : ''; ?>">
+                <i class="fa fa-user-circle nav-icon" aria-hidden="true"></i>
+                Profilim
+            </a>
+            <a asp-area="Customer" asp-controller="Settings" asp-action="Index" class="cust-nav-item <?php echo $active_page === 'settings' ? 'active' : ''; ?>">
+                <i class="fa fa-gear nav-icon" aria-hidden="true"></i>
+                Ayarlar
+            </a>
+            <a asp-area="" asp-controller="Contact" asp-action="Index" class="cust-nav-item">
+                <i class="fa fa-headset nav-icon" aria-hidden="true"></i>
+                Destek
+            </a>
+        </div>
+    </nav>
+
+    <!-- Alt kısım - çıkış -->
+    <div class="cust-sidebar-bottom">
+        <form method="POST" asp-area="" asp-controller="Auth" asp-action="SignOut">
+            <button class="cust-nav-item logout">
+                <i class="fa fa-right-from-bracket nav-icon" aria-hidden="true"></i>
+                Çıkış Yap
+            </button>
+        </form>
+    </div>
+
+</aside>

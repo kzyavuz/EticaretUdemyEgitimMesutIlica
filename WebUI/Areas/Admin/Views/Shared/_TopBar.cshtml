@@ -1,26 +1,83 @@
-﻿<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-    <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="index.html">Start Bootstrap</a>
-    <!-- Sidebar Toggle-->
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-    <!-- Navbar Search-->
-    <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-        <div class="input-group">
-            <input class="form-control" type="text" placeholder="Ara..." aria-label="Ara..." aria-describedby="btnNavbarSearch" />
-            <button class="btn btn-outline-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
-        </div>
-    </form>
-    <!-- Navbar-->
-    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" asp-controller="Account" asp-action="Index">Profil</a></li>
-                <li><a class="dropdown-item" asp-controller="Settings" asp-action="Index">Ayarlar</a></li>
-                <li><a class="dropdown-item" asp-controller="IncomingMessages" asp-action="Index">Gelen Mesajlar</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Çıkış Yap</a></li>
-            </ul>
-        </li>
-    </ul>
-</nav>
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+    <button class="topbar-toggle">
+        <i class="fas fa-bars" style="font-size:18px;"></i>
+    </button>
+
+    <div class="topbar-search">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" placeholder="Ürün, sipariş, müşteri ara...">
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="topbar-actions">
+        
+        <a asp-area="" asp-controller="Home" asp-action="Index" target="_blank" class="topbar-btn" title="Siteye Git" data-bs-toggle="tooltip" data-bs-placement="bottom">
+            <i class="fa fa-globe"></i>
+        </a>
+        
+        <div class="topbar-divider"></div>
+
+        <button class="theme-toggle" title="Tema Değiştir" data-bs-toggle="tooltip" data-bs-placement="bottom">
+            <i class="fas fa-sun"></i>
+        </button>
+
+        <div class="topbar-divider"></div>
+
+        <button class="topbar-btn" title="Bildirimler"  data-bs-toggle="tooltip" data-bs-placement="bottom">
+            <i class="fas fa-bell"></i>
+            <div class="topbar-badge"></div>
+        </button>
+
+        <button class="topbar-btn" title="Mesajlar"  data-bs-toggle="tooltip" data-bs-placement="bottom">
+            <i class="fas fa-comments"></i>
+            <div class="topbar-badge danger"></div>
+        </button>
+
+        <div class="topbar-divider"></div>
+
+        <!-- User Dropdown -->
+        <div class="dropdown">
+            <div class="user-dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="topbar-avatar">AY</div>
+                <div>
+                    <div class="user-name">Ahmet Yılmaz</div>
+                    <div class="user-role-badge" style="font-size:10px;color:var(--text-muted);">Süper Admin</div>
+                </div>
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <div style="padding:10px 14px 8px;">
+                        <div
+                            style="font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text-primary);">
+                            Ahmet Yılmaz
+                        </div>
+                        <div style="font-size:11px;color:var(--text-muted);">ahmet@nexusstore.com</div>
+                    </div>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index"><i class="fas fa-user"></i>
+                    Profilim</a></li>
+                    <li><a class="dropdown-item" asp-controller="Settings" asp-action="Index"><i class="fas fa-cog"></i>
+                        Hesap Ayarları</a></li>
+                        <li><a class="dropdown-item" asp-controller="Notifications" asp-action="Index"><i
+                            class="fas fa-bell"></i> Bildirim Tercihleri</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form method="post" asp-controller="Auth" asp-action="SignOut" asp-area="">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>

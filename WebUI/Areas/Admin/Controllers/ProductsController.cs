@@ -6,10 +6,11 @@ using WebUI.Helper;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using WebUI.Areas.Admin.Models;
+using Service.Extensions;
 
 namespace WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
     public class ProductsController : AdminBaseController
     {
         private readonly DatabaseContext _context;
@@ -18,7 +19,8 @@ namespace WebUI.Areas.Admin.Controllers
         private readonly string _uploadPath;
         private readonly IWebHostEnvironment _env;
 
-        public ProductsController(DatabaseContext context, ExcelImportHelper excelHelper, FileHelper fileHelper, IWebHostEnvironment env)
+        public ProductsController(DatabaseContext context, ExcelImportHelper excelHelper, FileHelper fileHelper,
+            IWebHostEnvironment env)
         {
             _context = context;
             _excelHelper = excelHelper;
@@ -27,43 +29,109 @@ namespace WebUI.Areas.Admin.Controllers
             _uploadPath = Path.Combine(_env.WebRootPath, "uploads", "products");
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var products = await _context.Products
+            List<Product>? data = await _context.Products
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
-                .OrderByDescending(p => p.CreatedDate)
+                .OrderByDescending(p => p.Id)
                 .ToListAsync();
-            return View(products);
+
+            List<StartCardModel> startCards = new()
+            {
+                new StartCardModel
+                {
+                    Title = "Tüm Ürünler",
+                    Value = data.Count,
+                    Class = "info",
+                    Tooltip = "Sitede bulunan toplam ürün sayısı",
+                    Icon = "fa-solid fa-boxes-stacked"
+                },
+                new StartCardModel
+                {
+                    Title = "Aktif Ürün",
+                    Value = data.Count(p => FunctionHelper.IsActive(p.Status)),
+                    Class = "success",
+                    Tooltip = "Sitede aktif olarak satışta olan ürün sayısı",
+                    Icon = "fa-solid fa-check"
+                },
+                new StartCardModel
+                {
+                    Title = "Kritik Stok",
+                    Value = data.Count(p => p.StockCount < 10),
+                    Class = "danger",
+                    Tooltip = "Stok adedi 10'un altında olan ürün sayısı",
+                    Icon = "fa-solid fa-triangle-exclamation"
+                },
+                new StartCardModel
+                {
+                    Title = "Taslak Ürünler",
+                    Value = data.Count(p => FunctionHelper.IsDraft(p.Status)),
+                    Class = "secondary",
+                    Tooltip = "Sitede taslak durumda olan ürün sayısı",
+                    Icon = "fa-solid fa-file"
+                }
+            };
+
+            List<BreadcrumbItem> breadcrumb = new()
+            {
+                new BreadcrumbItem { Title = "Ürünler" }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumb;
+            ViewBag.StartCards = startCards;
+
+            return View(data);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var product = await _context.Products
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            
+
             if (product == null)
                 return NotFound();
+
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Ürünler", Controller= "Products", Action = "Index" },
+                new BreadcrumbItem { Title = product.Title}
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
 
             return View(product);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Form(int? id)
         {
             ViewBag.Categories = await _context.Categories.ToListAsync();
             ViewBag.Brands = await _context.Brands.ToListAsync();
 
+            Product? data = new();
+
             if (id.HasValue)
             {
-                var product = await _context.Products.FindAsync(id);
-                if (product == null)
+                data = await _context.Products.FindAsync(id);
+
+                if (data == null)
                     return NotFound();
-                return View(product);
             }
 
-            return View(new Product());
+            List<BreadcrumbItem> breadcrumbs = new()
+            {
+                new BreadcrumbItem { Title = "Ürünler", Controller= "Products", Action = "Index" },
+                new BreadcrumbItem { Title = data?.Title ?? "Yeni Ürün" }
+            };
+
+            ViewBag.Breadcrumbs = breadcrumbs;
+
+            return View(data);
         }
 
         [HttpPost]
@@ -80,22 +148,26 @@ namespace WebUI.Areas.Admin.Controllers
             var (imagePath, imageFailed) = await ResolveImageAsync(Image, ImageUrl, _fileHelper, _uploadPath);
             if (imageFailed)
             {
-                SetSweetAlertMessage("error", "Hata", "Dosya yüklenirken hata oluştu. Lütfen geçerli bir görüntü dosyası seçin (JPG, PNG, GIF, WEBP).");
+                SetSweetAlertMessage("Hata",
+                    "Dosya yüklenirken hata oluştu. Lütfen geçerli bir görüntü dosyası seçin (JPG, PNG, GIF, WEBP).",
+                    "error");
                 ViewBag.Categories = await _context.Categories.ToListAsync();
                 ViewBag.Brands = await _context.Brands.ToListAsync();
                 return View("Form", model);
             }
+
             if (imagePath != null) model.Image = imagePath;
 
             _context.Products.Add(model);
             await _context.SaveChangesAsync();
-            SetSweetAlertMessage("success", "Başarılı", "Ürün başarıyla oluşturuldu.");
+            SetSweetAlertMessage("Başarılı", "Ürün başarıyla oluşturuldu.", "success");
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product model, IFormFile? Image, string? ImageUrl, bool DeleteImage = false)
+        public async Task<IActionResult> Edit(int id, Product model, IFormFile? Image, string? ImageUrl,
+            bool DeleteImage = false)
         {
             if (id != model.Id)
                 return NotFound();
@@ -109,19 +181,23 @@ namespace WebUI.Areas.Admin.Controllers
 
             try
             {
-                var (imagePath, imageFailed) = await ResolveImageOnEditAsync(Image, ImageUrl, model.Image, DeleteImage, _fileHelper, _uploadPath);
+                var (imagePath, imageFailed) = await ResolveImageOnEditAsync(Image, ImageUrl, model.Image, DeleteImage,
+                    _fileHelper, _uploadPath);
                 if (imageFailed)
                 {
-                    SetSweetAlertMessage("error", "Hata", "Dosya yüklenirken hata oluştu. Lütfen geçerli bir görüntü dosyası seçin (JPG, PNG, GIF, WEBP).");
+                    SetSweetAlertMessage("Hata",
+                        "Dosya yüklenirken hata oluştu. Lütfen geçerli bir görüntü dosyası seçin (JPG, PNG, GIF, WEBP).",
+                        "error");
                     ViewBag.Categories = await _context.Categories.ToListAsync();
                     ViewBag.Brands = await _context.Brands.ToListAsync();
                     return View("Form", model);
                 }
+
                 model.Image = imagePath;
 
                 _context.Products.Update(model);
                 await _context.SaveChangesAsync();
-                SetSweetAlertMessage("success", "Başarılı", "Ürün başarıyla güncellendi.");
+                SetSweetAlertMessage("Başarılı", "Ürün başarıyla güncellendi.", "success");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -130,6 +206,7 @@ namespace WebUI.Areas.Admin.Controllers
                 else
                     throw;
             }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -150,14 +227,36 @@ namespace WebUI.Areas.Admin.Controllers
 
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
-                SetSweetAlertMessage("success", "Başarılı", "Ürün başarıyla silindi.");
+                SetSweetAlertMessage("Başarılı", "Ürün başarıyla silindi.", "success");
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                SetSweetAlertMessage("error", "Hata", $"Silme işlemi başarısız: {ex.Message}");
+                SetSweetAlertMessage("Hata", $"Silme işlemi başarısız: {ex.Message}", "error");
                 return RedirectToAction("Index");
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkDelete(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                SetSweetAlertMessage("Hata", "Silinecek kayıt seçilmedi.", "error");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var items = await _context.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
+            foreach (var item in items)
+                if (!string.IsNullOrEmpty(item.Image))
+                    _fileHelper.Delete(item.Image);
+
+            _context.Products.RemoveRange(items);
+            await _context.SaveChangesAsync();
+
+            SetSweetAlertMessage("Başarılı", $"{items.Count} ürün silindi.", "success");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -168,19 +267,25 @@ namespace WebUI.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult DownloadSampleExcel()
             => DownloadSampleExcel("urunler_ornek.xlsx",
-                new[] {
-                    ("urun_adi", true),
-                    ("aciklama", false),
-                    ("urun_kodu", false),
-                    ("fiyat", false),
-                    ("stok", false),
-                    ("kategori", false),
-                    ("marka", false),
-                    ("durum", false),
-                    ("anasayfa", false),
-                    ("sira_numarasi", false)
+                new[]
+                {
+                    (DisplayName<Product>(nameof(Product.Title)), true),
+                    (DisplayName<Product>(nameof(Product.Description)), false),
+                    (DisplayName<Product>(nameof(Product.ProductCode)), false),
+                    (DisplayName<Product>(nameof(Product.Image)), false),
+                    (DisplayName<Product>(nameof(Product.Price)), false),
+                    (DisplayName<Product>(nameof(Product.StockCount)), false),
+                    (DisplayName<Product>(nameof(Product.CategoryId)), false),
+                    (DisplayName<Product>(nameof(Product.BrandId)), false),
+                    (DisplayName<Product>(nameof(Product.Status)), false),
+                    (DisplayName<Product>(nameof(Product.IsHome)), false),
+                    (DisplayName<Product>(nameof(Product.OrderNumber)), false)
                 },
-                new object[] { "Örnek Ürün", "Kaliteli bir ürün", "SKU-001", 99.90m, 50, "Örnek Kategori", "Örnek Marka Aş", "evet", "hayir", 1 });
+                new object[]
+                {
+                    "Örnek Ürün", "Kaliteli bir ürün", "", "SKU-001", 99.90m, 50, "Örnek Kategori", "Örnek Marka Aş",
+                    1, "hayır", 1
+                });
 
         [HttpGet]
         public async Task<IActionResult> ExportExcel()
@@ -194,17 +299,19 @@ namespace WebUI.Areas.Admin.Controllers
             using var package = new ExcelPackage();
             var ws = package.Workbook.Worksheets.Add("Ürünler");
 
-            ws.Cells[1, 1].Value = "urun_adi";
-            ws.Cells[1, 2].Value = "aciklama";
-            ws.Cells[1, 3].Value = "urun_kodu";
-            ws.Cells[1, 4].Value = "fiyat";
-            ws.Cells[1, 5].Value = "stok";
-            ws.Cells[1, 6].Value = "kategori";
-            ws.Cells[1, 7].Value = "marka";
-            ws.Cells[1, 8].Value = "durum";
-            ws.Cells[1, 9].Value = "anasayfa";
+            ws.Cells[1, 1].Value = DisplayName<Product>(nameof(Product.Title));
+            ws.Cells[1, 2].Value = DisplayName<Product>(nameof(Product.Description));
+            ws.Cells[1, 3].Value = DisplayName<Product>(nameof(Product.ProductCode));
+            ws.Cells[1, 4].Value = DisplayName<Product>(nameof(Product.Image));
+            ws.Cells[1, 5].Value = DisplayName<Product>(nameof(Product.Price));
+            ws.Cells[1, 6].Value = DisplayName<Product>(nameof(Product.StockCount));
+            ws.Cells[1, 7].Value = DisplayName<Product>(nameof(Product.CategoryId));
+            ws.Cells[1, 8].Value = DisplayName<Product>(nameof(Product.BrandId));
+            ws.Cells[1, 9].Value = DisplayName<Product>(nameof(Product.Status));
+            ws.Cells[1, 10].Value = DisplayName<Product>(nameof(Product.IsHome));
+            ws.Cells[1, 11].Value = DisplayName<Product>(nameof(Product.OrderNumber));
 
-            using (var headerRange = ws.Cells[1, 1, 1, 9])
+            using (var headerRange = ws.Cells[1, 1, 1, 11])
             {
                 headerRange.Style.Font.Bold = true;
                 headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -218,12 +325,14 @@ namespace WebUI.Areas.Admin.Controllers
                 ws.Cells[row, 1].Value = p.Title;
                 ws.Cells[row, 2].Value = p.Description;
                 ws.Cells[row, 3].Value = p.ProductCode;
-                ws.Cells[row, 4].Value = p.Price;
-                ws.Cells[row, 5].Value = p.StockCount;
-                ws.Cells[row, 6].Value = p.Category?.Title;
-                ws.Cells[row, 7].Value = p.Brand?.Name;
-                ws.Cells[row, 8].Value = p.IsActive ? "evet" : "hayir";
-                ws.Cells[row, 9].Value = p.IsHome ? "evet" : "hayir";
+                ws.Cells[row, 4].Value = p.Image;
+                ws.Cells[row, 5].Value = p.Price;
+                ws.Cells[row, 6].Value = p.StockCount;
+                ws.Cells[row, 7].Value = p.Category?.Title;
+                ws.Cells[row, 8].Value = p.Brand?.Name;
+                ws.Cells[row, 9].Value = p.Status;
+                ws.Cells[row, 10].Value = p.IsHome ? "evet" : "hayir";
+                ws.Cells[row, 11].Value = p.OrderNumber;
                 row++;
             }
 

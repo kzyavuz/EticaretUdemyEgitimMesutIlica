@@ -1,0 +1,84 @@
+﻿@model WebUI.Models.ProductCardViewModel
+
+@{
+    var product = Model.Product;
+    string? imageSrc = ResolveImageSrc(product.Image);
+    bool inStock = product.StockCount > 0;
+}
+
+<link rel="stylesheet" href="~/css/components/product_card.css" />
+
+
+<div class="prod-card">
+
+    <!-- Image Area -->
+
+    <div class="prod-card-img">
+
+        <button type="button"
+                onclick="editToFavorites(this, @product.Id)"
+                class="prod-card-fav-btn"
+                aria-label="Favorilere Ekle"
+                data-add-url="@Url.Action("Add", "Favorites", new { area = "Customer" })"
+                data-remove-url="@Url.Action("Remove", "Favorites", new { area = "Customer" })"
+                data-favorite="@(Model.IsFavorite ? "true" : "false")">
+            
+            <span class="fav-icon">
+                <i class="fa-solid fa-heart @(Model.IsFavorite ? "" : "d-none")"></i>
+                <i class="fa-regular fa-heart @(Model.IsFavorite ? "d-none" : "")"></i>
+            </span>
+        </button>
+            
+        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">
+            <img src="@imageSrc" alt="@product.Title" loading="lazy" decoding="async" />
+            @if (!string.IsNullOrEmpty(product.Category?.Title))
+            {
+                <span class="prod-card-cat">@product.Category.Title</span>
+            }
+
+            @if (!inStock)
+            {
+                <span class="prod-card-out">Stok Yok</span>
+            }
+        </a>
+    </div>
+    
+    <!-- Body -->
+    <div class="prod-card-body">
+        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">
+
+            @if (product.Brand != null)
+            {
+                <span class="prod-card-brand">@product.Brand.Name</span>
+            }
+            <div>
+                <h3 class="prod-card-title">@product.Title</h3>
+
+                @if (!string.IsNullOrWhiteSpace(product.Description))
+                {
+                    <p class="prod-card-desc">@product.Description</p>
+                }
+            </div>
+            <!-- Price + Link Row -->
+        </a>
+        <div class="prod-card-footer">
+            <div>
+                <span class="prod-card-price">@product.Price.ToString("C2")</span>
+                <span class="prod-card-stock @(inStock ? "in-stock" : "out-stock")">
+                    @(inStock ? $"{product.StockCount} adet stokta" : "Stok yok")
+                </span>
+            </div>
+
+            <button type="button"
+                    onclick="editToCart(this, @product.Id)"
+                    class="btn-cart @(Model.IsInCart ? "btn-in-cart" : "")"
+                    data-process-type="add"
+                    aria-label="Sepete Ekle"
+                    data-add-url="@Url.Action("AddToCart", "Cart", new { area = "Customer" })">
+                <i class="fa @(Model.IsInCart ? "fa-check me-1" : "fa-shopping-cart")" aria-hidden="true"></i>
+                <span class="btn-text">@(Model.IsInCart ? "Sepette" : "Sepete Ekle")</span>
+            </button>
+
+        </div>
+    </div>
+</div>
